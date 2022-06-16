@@ -15,72 +15,62 @@ public class Main {
         // создаём простую задачу
         Task task1 = new Task("Buy", "buy a book on Java", "NEW");
         // создаём сложную задачу, пока без подзадач
-        Task task2 = new Epic("Study", "learn english");
+        Epic task2 = new Epic("Study", "learn english");
         // создаём сложные задачи
-        Task task3 = createEpic("Understand", "understand the task of this sprint", createListSub1());
+        Epic task3 = new Epic("Understand", "understand the task of this sprint");
+
+        Subtask subtask1 = new Subtask("One", "qwerty", "NEW", 2);
+        Subtask subtask2 = new Subtask("Two", "qwerty", "IN_PROGRESS", 2);
+        Subtask subtask3 = new Subtask("One", "qwerty", "NEW", 2);
+        Subtask subtask4 = new Subtask("Two", "qwerty", "DONE", 3);
+        Subtask subtask5 = new Subtask("three", "qwerty", "IN_PROGRESS", 3);
+
         manager.addTask(task1);
-        manager.addTask(task2);
-        manager.addTask(task3);
+        manager.addEpic(task2);
+        manager.addEpic(task3);
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+        manager.addSubtask(subtask3);
+        manager.addSubtask(subtask4);
+        manager.addSubtask(subtask5);
 
         System.out.println("Получим список всех задач:");
-        for (Integer i : manager.getTaskList().keySet()) {
-            System.out.println(manager.getTaskList().get(i));
-        }
-        System.out.println();
-
+        check(manager);
 
         System.out.println("Получение задачи по идентификатору:");
-        System.out.println(manager.getTaskById(3) + "\n");
+        System.out.println(manager.getEpicById(2) + "\n");
 
         System.out.println("Обновление задачи по идентификатору:");
-        Task task4 = createEpic("Understand", "understand the task of this sprint", createListSub2());
-        manager.updateTask(task4, 3);
-        System.out.println(manager.getTaskById(3) + "\n");
-        System.out.println("Получим список всех задач:");
+        Subtask subtask = new Subtask("olololo", "qwerty", "IN_PROGRESS", 3);
+        subtask.setId(8);
+        manager.updateTask(subtask);
+        check(manager);
+/*
+        System.out.println("Когда удалим эпик:");
+        manager.deleteEpicById(2);
+        check(manager);*/
+
+        System.out.println("Когда удалим subtask:");
+        manager.deleteSubtaskById(5);
+        check(manager);
+
+    }
+
+    public static void check(Manager manager) {
         for (Integer i : manager.getTaskList().keySet()) {
             System.out.println(manager.getTaskList().get(i));
         }
         System.out.println();
 
-        //удаление по Id
-        manager.deleteTasksById(1);
-
-        System.out.println("Получим список всех подзадач определённого эпика:");
-        System.out.println(manager.getAllSubtask(3));
+        for (Integer i : manager.getEpicList().keySet()) {
+            System.out.println(manager.getEpicList().get(i));
+        }
         System.out.println();
 
-        // удалим все задачи
-        manager.deleteAllTasks();
-        try {
-            for (Integer i : manager.getTaskList().keySet()) {
-                System.out.println(manager.getTaskList().get(i));
-            }
-        } catch (NullPointerException ex) {
-            System.out.println("Список задач пуст");
+        for (Integer i : manager.getSubtaskList().keySet()) {
+            System.out.println(manager.getSubtaskList().get(i));
         }
-    }
-
-    public static Epic createEpic(String name, String des, List<Subtask> s) {
-        return new Epic(name, des, s);
-    }
-
-    public static List<Subtask> createListSub1() {
-        Subtask subtask1 = new Subtask("One", "qwerty", "DONE");
-        Subtask subtask2 = new Subtask("Two", "qwerty", "IN_PROGRESS");
-        List<Subtask> s = new ArrayList<>();
-        s.add(subtask1);
-        s.add(subtask2);
-        return s;
-    }
-
-    public static List<Subtask> createListSub2() {
-        Subtask subtask1 = new Subtask("One", "qwerty", "DONE");
-        Subtask subtask2 = new Subtask("Two", "qwerty", "DONE");
-        Subtask subtask3 = new Subtask("three", "qwerty", "DONE");
-        List<Subtask> s = new ArrayList<>();
-        s.add(subtask1);
-        s.add(subtask2);
-        s.add(subtask3);
-        return s;
+        System.out.println();
     }
 }
+

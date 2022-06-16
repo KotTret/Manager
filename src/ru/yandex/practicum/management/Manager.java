@@ -47,7 +47,7 @@ public class Manager {
     }
 
     public void addSubtask(Subtask subtask) {
-        if (epicList.containsKey(subtask.getIdEpic())) {
+        if (!epicList.containsKey(subtask.getIdEpic())) {
             System.out.println("Данный Subtask не подходит ни под один Epic");
         } else {
             id++;
@@ -94,7 +94,7 @@ public class Manager {
             System.out.println("Задач с таким идентификатором не найдено");
         } else {
             Subtask subtask = subtaskList.get(id);
-            epicList.get(subtask.getIdEpic()).getListIdSubtask().remove(subtask.getId());
+            epicList.get(subtask.getIdEpic()).getListIdSubtask().remove(Integer.valueOf(subtask.getId()));
             subtaskList.remove(id);
             setStatusEpic(epicList.get(subtask.getIdEpic()));
         }
@@ -106,6 +106,12 @@ public class Manager {
         } else if (!epicList.containsKey(id)) {
             System.out.println("Задач с таким идентификатором не найдено");
         } else {
+            HashMap<Integer, Subtask> subtaskListHelp = new HashMap<>(subtaskList);
+            for (Subtask s : subtaskListHelp.values()) {
+                if (s.getIdEpic().equals(id)) {
+                    subtaskList.remove(s.getId());
+                }
+            }
             epicList.remove(id);
         }
     }
@@ -130,12 +136,22 @@ public class Manager {
 
     public void updateTask(Task task) {
         if (task instanceof Epic) {
+            if (!epicList.containsKey(task.getId())) {
+                return;
+            }
             epicList.put(task.getId(), (Epic) task);
             this.setStatusEpic(epicList.get(task.getId()));
         } else if (task instanceof Subtask) {
-            subtaskList.put(task.getId(), (Subtask) task);
-            this.setStatusEpic(epicList.get(task.getId()));
+            if (!subtaskList.containsKey(task.getId())) {
+                return;
+            }
+            Subtask subtask = (Subtask) task;
+            subtaskList.put(subtask.getId(), subtask);
+            this.setStatusEpic(epicList.get(subtask.getIdEpic()));
         } else {
+            if (!taskList.containsKey(task.getId())) {
+                return;
+            }
             taskList.put(task.getId(), task);
         }
 
@@ -153,10 +169,14 @@ public class Manager {
 
     public void deleteAllEpic() {
         epicList.clear();
+        this.deleteAllSubtask();
     }
 
     public void deleteAllSubtask() {
         subtaskList.clear();
+        for (Epic epic : epicList.values()) {
+            epic.setStatus("NEW");
+        }
     }
 
     public void setStatusEpic(Epic epic) {
