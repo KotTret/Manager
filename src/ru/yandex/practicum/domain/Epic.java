@@ -1,5 +1,7 @@
 package ru.yandex.practicum.domain;
 
+import ru.yandex.practicum.Status;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +16,7 @@ public class Epic extends Task {
         return listIdSubtask;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

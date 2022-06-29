@@ -1,14 +1,15 @@
-package ru.yandex.practicum.management;
+package ru.yandex.practicum.management.task;
 
-public class Managers<T> {
+import ru.yandex.practicum.management.history.HistoryManager;
 
-    private final T manager;
+public abstract class Managers {
 
-    public Managers(T manager) {
-        this.manager = manager;
-    }
-
-    public T getDefault() {
+    public static TaskManager getDefault(TaskManager manager) {
         return manager;
     }
+
+    public static HistoryManager getDefaultHistory(HistoryManager historyManager) {
+        return historyManager;
+    }
 }
+

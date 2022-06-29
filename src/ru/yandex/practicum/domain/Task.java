@@ -1,17 +1,19 @@
 package ru.yandex.practicum.domain;
 
+import ru.yandex.practicum.Status;
+
 import java.util.Objects;
 
 public class Task {
     protected String name;
     protected String description;
-    protected String status;
+    protected Status status;
     protected Integer id;
 
     public Task(String name, String description, String status) {
         this.name = name;
         this.description = description;
-        this.status = status;
+        this.status = Status.valueOf(status.toUpperCase());
     }
 
     public String getName() {
@@ -22,7 +24,7 @@ public class Task {
         return description;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
