@@ -1,34 +1,25 @@
-package ru.yandex.practicum.management;
+package ru.yandex.practicum.management.task;
 
 import ru.yandex.practicum.Status;
 import ru.yandex.practicum.domain.Epic;
 import ru.yandex.practicum.domain.Subtask;
 import ru.yandex.practicum.domain.Task;
+import ru.yandex.practicum.management.history.HistoryManager;
+import ru.yandex.practicum.management.history.InMemoryHistoryManager;
 
 import java.util.*;
 
-public class InMemoryTaskManager implements TaskManager{
+public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> taskList = new HashMap<>();
     private final HashMap<Integer, Epic> epicList = new HashMap<>();
     private final HashMap<Integer, Subtask> subtaskList = new HashMap<>();
-    private final ArrayList<Task> browsingHistoryTask = new ArrayList<>();
+    private final HistoryManager historyManager = Managers.getDefaultHistory(new InMemoryHistoryManager());
 
     private int id = 0;
-    private int iter = 0;
-
 
     @Override
-    public List<Task> getHistory() {
-        return browsingHistoryTask;
-    }
-
-    private void addHistory(Task task) {
-        if (browsingHistoryTask.size() == 10) {
-            browsingHistoryTask.add(iter++, task);
-            if (iter == 9) {iter = 0;}
-        } else {
-            browsingHistoryTask.add(task);
-        }
+    public HistoryManager getHistoryManager() {
+        return historyManager;
     }
 
     @Override
@@ -37,7 +28,7 @@ public class InMemoryTaskManager implements TaskManager{
             System.out.println("Задач с таким идентификатором не найдено");
             return null;
         } else {
-            addHistory(taskList.get(id));
+            historyManager.addHistory(taskList.get(id));
             return taskList.get(id);
         }
     }
@@ -48,7 +39,7 @@ public class InMemoryTaskManager implements TaskManager{
             System.out.println("Задач с таким идентификатором не найдено");
             return null;
         } else {
-            addHistory(epicList.get(id));
+            historyManager.addHistory(epicList.get(id));
             return epicList.get(id);
 
         }
@@ -60,7 +51,7 @@ public class InMemoryTaskManager implements TaskManager{
             System.out.println("Задач с таким идентификатором не найдено");
             return null;
         } else {
-            addHistory(subtaskList.get(id));
+            historyManager.addHistory(subtaskList.get(id));
             return subtaskList.get(id);
         }
     }
@@ -92,23 +83,26 @@ public class InMemoryTaskManager implements TaskManager{
         epicList.put(id, epic);
     }
 
+    @Override
     public HashMap<Integer, Task> getTaskList() {
-        for (Task task: taskList.values()) {
-            addHistory(task);
+        for (Task task : taskList.values()) {
+            historyManager.addHistory(task);
         }
         return new HashMap<>(taskList);
     }
 
+    @Override
     public HashMap<Integer, Epic> getEpicList() {
         for (Epic epic : epicList.values()) {
-            addHistory(epic);
+            historyManager.addHistory(epic);
         }
         return new HashMap<>(epicList);
     }
 
+    @Override
     public HashMap<Integer, Subtask> getSubtaskList() {
-        for (Subtask subtask: subtaskList.values()) {
-            addHistory(subtask);
+        for (Subtask subtask : subtaskList.values()) {
+            historyManager.addHistory(subtask);
         }
         return new HashMap<>(subtaskList);
     }
@@ -165,7 +159,7 @@ public class InMemoryTaskManager implements TaskManager{
             List<Subtask> subListEpic = new ArrayList<>();
             for (Integer i : epicList.get(id).getListIdSubtask()) {
                 subListEpic.add(subtaskList.get(i));
-                addHistory(subtaskList.get(i));
+                historyManager.addHistory(subtaskList.get(i));
             }
             return subListEpic;
         }
