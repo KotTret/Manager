@@ -1,5 +1,4 @@
 package ru.yandex.practicum.domain;
-
 import ru.yandex.practicum.Status;
 
 import java.util.Objects;

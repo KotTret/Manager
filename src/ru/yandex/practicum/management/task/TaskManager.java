@@ -3,14 +3,13 @@ package ru.yandex.practicum.management.task;
 import ru.yandex.practicum.domain.Epic;
 import ru.yandex.practicum.domain.Subtask;
 import ru.yandex.practicum.domain.Task;
-import ru.yandex.practicum.management.history.HistoryManager;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface TaskManager {
 
-    public HistoryManager getHistoryManager();
+    List<Task>  getHistory();
 
     Task getTaskById(Integer id);
 
@@ -42,10 +41,10 @@ public interface TaskManager {
 
     void deleteAllSubtask();
 
-    HashMap<Integer, Task> getTaskList();
+    Map<Integer, Task> getTasks();
 
-    HashMap<Integer, Epic> getEpicList();
+    Map<Integer, Epic> getEpics();
 
-    HashMap<Integer, Subtask> getSubtaskList();
+    Map<Integer, Subtask> getSubtasks();
 
 }

@@ -3,7 +3,6 @@ package ru.yandex.practicum;
 import ru.yandex.practicum.domain.Epic;
 import ru.yandex.practicum.domain.Subtask;
 import ru.yandex.practicum.domain.Task;
-import ru.yandex.practicum.management.task.InMemoryTaskManager;
 import ru.yandex.practicum.management.task.Managers;
 import ru.yandex.practicum.management.task.TaskManager;
 
@@ -12,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        TaskManager manager = Managers.getDefault(new InMemoryTaskManager());
+        TaskManager manager = Managers.getDefault();
         // создаём простую задачу
         Task task1 = new Task("1", "buy a book on Java", "NEW");
         Task task2 = new Task("2", "buy a book on Java", "DONE");
@@ -39,16 +38,16 @@ public class Main {
         manager.addSubtask(subtask3);
         manager.addSubtask(subtask4);
         manager.addSubtask(subtask5);
-        manager.getEpicList();
-        manager.getSubtaskList();
-        System.out.println(manager.getHistoryManager().getHistory());
-        System.out.println(manager.getHistoryManager().getHistory().size());
-        manager.getEpicList();
-        System.out.println(manager.getHistoryManager().getHistory());
-        System.out.println(manager.getHistoryManager().getHistory().size());
-        manager.getEpicList();
-        System.out.println(manager.getHistoryManager().getHistory());
-        System.out.println(manager.getHistoryManager().getHistory().size());
+        manager.getEpics();
+        manager.getSubtasks();
+        System.out.println(manager.getHistory());
+        System.out.println(manager.getHistory().size());
+        manager.getEpics();
+        System.out.println(manager.getHistory());
+        System.out.println(manager.getHistory().size());
+        manager.getEpics();
+        System.out.println(manager.getHistory());
+        System.out.println(manager.getHistory().size());
     }
 }
 

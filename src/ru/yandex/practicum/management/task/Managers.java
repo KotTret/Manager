@@ -1,15 +1,15 @@
 package ru.yandex.practicum.management.task;
 
 import ru.yandex.practicum.management.history.HistoryManager;
+import ru.yandex.practicum.management.history.InMemoryHistoryManager;
 
-public abstract class Managers {
+public final class Managers {
 
-    public static TaskManager getDefault(TaskManager manager) {
-        return manager;
+    public static TaskManager getDefault() {
+        return  new InMemoryTaskManager();
     }
 
-    public static HistoryManager getDefaultHistory(HistoryManager historyManager) {
-        return historyManager;
+    public static HistoryManager getDefaultHistory() {
+        return new InMemoryHistoryManager();
     }
 }
-

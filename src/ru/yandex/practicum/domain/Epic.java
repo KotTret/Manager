@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
-    private List<Integer> listIdSubtask = new ArrayList<>();
+    private final List<Integer> listIdSubtask = new ArrayList<>();
 
     public Epic(String name, String description) {
         super(name, description, "NEW");
@@ -28,12 +28,7 @@ public class Epic extends Task {
                 ", status='" + status + '\'' +
                 ", id=" + id;
 
-        if (listIdSubtask != null) {
-            result = result + ", size_listSubtask=" + listIdSubtask.size() + '}';
-            ;
-        } else {
-            result = result + ", listSubtask=null" + '}';
-        }
+        result = result + ", size_listSubtask=" + listIdSubtask.size() + '}';
         return result;
     }
 }

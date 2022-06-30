@@ -7,20 +7,19 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final ArrayList<Task> browsingHistoryTask = new ArrayList<>();
+    private static final int MAX_LENGTH_HISTOrY = 10;
+    private final List<Task> browsingHistoryTask = new ArrayList<>();
 
     @Override
     public List<Task> getHistory() {
-        return browsingHistoryTask;
+        return new ArrayList<>(browsingHistoryTask);
     }
 
     @Override
     public void addHistory(Task task) {
-        if (browsingHistoryTask.size() == 10) {
+        if (browsingHistoryTask.size() == MAX_LENGTH_HISTOrY) {
             browsingHistoryTask.remove(0);
-            browsingHistoryTask.add(task);
-        } else {
-            browsingHistoryTask.add(task);
         }
+        browsingHistoryTask.add(task);
     }
 }
