@@ -6,10 +6,11 @@ import ru.yandex.practicum.domain.Task;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface TaskManager {
 
-    List<Task>  getHistory();
+    Set<Task> getHistory();
 
     Task getTaskById(Integer id);
 

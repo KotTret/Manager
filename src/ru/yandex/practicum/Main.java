@@ -17,8 +17,7 @@ public class Main {
         Task task2 = new Task("2", "buy a book on Java", "DONE");
         manager.addTask(task1);
         manager.addTask(task2);
-        manager.getTaskById(1);
-        manager.getTaskById(2);
+
 
         // создаём сложную задачу, пока без подзадач
         Epic task3 = new Epic("3", "learn english");
@@ -38,16 +37,24 @@ public class Main {
         manager.addSubtask(subtask3);
         manager.addSubtask(subtask4);
         manager.addSubtask(subtask5);
-        manager.getEpics();
-        manager.getSubtasks();
+        manager.getTaskById(1);
+        manager.getTaskById(2);
         System.out.println(manager.getHistory());
         System.out.println(manager.getHistory().size());
-        manager.getEpics();
+        manager.getTaskById(1);
+        manager.getEpicById(3);
+       manager.getTaskById(2);
+        manager.getTaskById(1);
+        manager.getSubtaskById(5);
+        manager.getSubtaskById(6);
+        manager.deleteTaskById(1);
         System.out.println(manager.getHistory());
         System.out.println(manager.getHistory().size());
-        manager.getEpics();
+        manager.deleteEpicById(3);
+        //manager.deleteSubtaskById(5);
         System.out.println(manager.getHistory());
         System.out.println(manager.getHistory().size());
+        //System.out.println(manager.getAllSubtaskOfEpic(3));
     }
 }
 
