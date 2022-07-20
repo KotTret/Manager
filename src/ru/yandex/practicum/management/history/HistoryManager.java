@@ -2,16 +2,17 @@ package ru.yandex.practicum.management.history;
 
 import ru.yandex.practicum.domain.Task;
 
-import java.util.Set;
+import java.util.List;
+
 
 public interface HistoryManager {
 
-    Set<Task> getHistory();
+    List<Task> getHistory();
 
     void addHistory(Task task);
 
-    void remove(Task task);
-
     void clear();
+
+    void removeNode(Integer id);
 
 }

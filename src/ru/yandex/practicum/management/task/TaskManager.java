@@ -10,7 +10,7 @@ import java.util.Set;
 
 public interface TaskManager {
 
-    Set<Task> getHistory();
+    List<Task> getHistory();
 
     Task getTaskById(Integer id);
 

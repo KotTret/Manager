@@ -1,45 +1,94 @@
 package ru.yandex.practicum.management.history;
-
 import ru.yandex.practicum.domain.Task;
 
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-
-    private final Set<Task> browsingHistoryTask = new LinkedHashSet();
-/*    Привет, не обижайся, что тут пишу :). Я что-то не понял танцы с бубнами в описании выпонения задания.
-    Цель, которая стоит в задании "реализовать функциональность так, чтобы время просмотра задачи никак не зависело от общего количества задач в истории"
-    Но есть же LinkedHashSet, у которого сложность по основным операциям, такая же как у HashSet,
-    и составляет  O(1) всегда, также защищает от повторений и выдерживает последовательность,  и при удалении
-    очень удобно метод remove у HashMap возвращает объект, и мы его сразу передаем в remove LinkedHashSet.
-    Ну или я не до конца понял теорию (О_о)
-    */
+    private final Map<Integer, Node> browsingHistoryTask = new HashMap<>();
+    private Node head;
+    private Node tail;
 
     @Override
-    public Set<Task> getHistory() {
-        return new LinkedHashSet<>(browsingHistoryTask);
+    public List<Task> getHistory() {
+        if (browsingHistoryTask.isEmpty()) {
+            System.out.println("Просмотренных задач нет");
+            return null;
+        } else {
+            return getTasks();
+        }
     }
 
     @Override
     public void addHistory(Task task) {
-        if (browsingHistoryTask.contains(task)) {
-            browsingHistoryTask.remove(task);
-            browsingHistoryTask.add(task);
-        } else {
-            browsingHistoryTask.add(task);
-        }
+        linkLast(task);
 
     }
 
     @Override
-    public void remove(Task task) {
-        browsingHistoryTask.remove(task);
+    public void removeNode(Integer id) {
+        if(browsingHistoryTask.size() == 1) {this.clear();}
+        if (browsingHistoryTask.containsKey(id)) {
+            Node remoteNode = browsingHistoryTask.remove(id);
+            if (remoteNode == head) {
+                remoteNode.next.prev = null;
+                head = remoteNode.next;
+            } else if (remoteNode == tail) {
+                remoteNode.prev.next = null;
+                tail = remoteNode.prev;
+            } else {
+                remoteNode.prev.next = remoteNode.next;
+                remoteNode.next.prev = remoteNode.prev;
+            }
+        }
     }
+
+    private void linkLast(Task task) {
+        final Node oldTail = tail;
+        final Node newNode = new Node(tail, task, null);
+        tail = newNode;
+        if (oldTail == null)
+            head = newNode;
+        else
+            oldTail.next = newNode;
+
+        if (browsingHistoryTask.containsKey(task.getId())) {
+            removeNode(task.getId());
+        }
+        browsingHistoryTask.put(task.getId(), newNode);
+    }
+
+    private List<Task> getTasks() {
+        List<Task> browsingHistory = new ArrayList<>();
+        Node helpNextNode = head.next;
+        browsingHistory.add(head.data);
+
+        for (int i = 1; i < browsingHistoryTask.size(); i++) {
+            browsingHistory.add(helpNextNode.data);
+            if (helpNextNode == tail) {
+                break;
+            }
+            helpNextNode = browsingHistoryTask.get(helpNextNode.next.data.getId());
+        }
+        return browsingHistory;
+    }
+
 
     @Override
     public void clear() {
         browsingHistoryTask.clear();
     }
 
+
+    private static class Node {
+        public Task data;
+        public Node next;
+        public Node prev;
+
+        public Node(Node prev, Task data, Node next) {
+            this.data = data;
+            this.next = next;
+            this.prev = prev;
+        }
+    }
 }
