@@ -13,6 +13,6 @@ public interface HistoryManager {
 
     void clear();
 
-    void removeNode(Integer id);
+    void remove(Integer id);
 
 }

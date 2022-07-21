@@ -37,53 +37,19 @@ public class Main {
         manager.addSubtask(subtask3);
         manager.addSubtask(subtask4);
         manager.addSubtask(subtask5);
-/*        manager.getTaskById(1);
-        manager.getTaskById(2);
-        System.out.println(manager.getHistory());
-        System.out.println(manager.getHistory().size());
+
         manager.getTaskById(1);
         manager.getEpicById(3);
-        manager.getSubtaskById(5);
-        System.out.println(manager.getHistory());
-        System.out.println(manager.getHistory().size());
-        manager.deleteTaskById(1);
-        manager.getEpicById(3);
-        System.out.println(manager.getHistory());
-        System.out.println(manager.getHistory().size());
-        manager.getSubtaskById(6);
         manager.getTaskById(2);
-        System.out.println(manager.getHistory());
-        System.out.println(manager.getHistory().size());
+        manager.getTaskById(1);
+        manager.getSubtaskById(5);
+        manager.getSubtaskById(6);
         manager.deleteEpicById(3);
-        System.out.println(manager.getHistory());
-        System.out.println(manager.getHistory().size());
-        manager.deleteAll();
-        System.out.println(manager.getHistory());*/
-      //  manager.getTaskById(1);
-/*        manager.getTaskById(2);
-        manager.getEpicById(3);
-        System.out.println(manager.getHistory());
-        manager.deleteAllTask();
-        manager.getSubtaskById(5);
-        manager.getSubtaskById(6);
-        System.out.println(manager.getHistory());
-        manager.deleteAllEpic();
-        System.out.println(manager.getHistory());*/
-
-/*        manager.getTaskById(1);
-        manager.getEpicById(3);
-       manager.getTaskById(2);
-        manager.getTaskById(1);
-        manager.getSubtaskById(5);
-        manager.getSubtaskById(6);
+       manager.deleteTaskById(2);
+       manager.deleteTaskById(1);
 
         System.out.println(manager.getHistory());
-        System.out.println(manager.getHistory().size());
-      //  manager.deleteEpicById(3);
-        //manager.deleteSubtaskById(5);
-        System.out.println(manager.getHistory());
-        System.out.println(manager.getHistory().size());
-        //System.out.println(manager.getAllSubtaskOfEpic(3));*/
+
     }
 }
 
