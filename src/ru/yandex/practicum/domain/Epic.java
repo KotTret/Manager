@@ -20,7 +20,12 @@ public class Epic extends Task {
         this.status = status;
     }
 
+
     @Override
+    public String toString() {
+        return id + "," + "Epic" + "," + name + "," + status + "," + description + "," + " ";
+    }
+/*    @Override
     public String toString() {
         String result = "Epic{" +
                 "name='" + name + '\'' +
@@ -30,5 +35,5 @@ public class Epic extends Task {
 
         result = result + ", size_listSubtask=" + listIdSubtask.size() + '}';
         return result;
-    }
+    }*/
 }

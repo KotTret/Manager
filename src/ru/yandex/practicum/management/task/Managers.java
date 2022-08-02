@@ -9,6 +9,10 @@ public final class Managers {
         return  new InMemoryTaskManager();
     }
 
+    public static TaskManager getFileBackedTasksManager(String pathCSV) {
+        return  new FileBackedTasksManager(pathCSV);
+    }
+
     public static HistoryManager getDefaultHistory() {
         return new InMemoryHistoryManager();
     }

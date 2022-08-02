@@ -9,6 +9,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node head;
     private Node tail;
 
+
     @Override
     public List<Task> getHistory() {
             return getTasks();
@@ -17,7 +18,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void addHistory(Task task) {
         linkLast(task);
-
     }
 
     @Override

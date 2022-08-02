@@ -37,13 +37,19 @@ public class Task {
 
     @Override
     public String toString() {
+        return id + "," + "Task" + "," + name + "," + status + "," + description + "," + " ";
+    }
+
+
+    /*    @Override
+    public String toString() {
         return "Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
                 ", id=" + id +
                 '}';
-    }
+    }*/
 
     @Override
     public boolean equals(Object o) {

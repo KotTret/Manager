@@ -6,14 +6,32 @@ import ru.yandex.practicum.domain.Task;
 import ru.yandex.practicum.management.task.Managers;
 import ru.yandex.practicum.management.task.TaskManager;
 
+import java.nio.file.Path;
+
 
 public class Main {
 
     public static void main(String[] args) {
+/*        String pathCSV = "test.csv";
+        TaskManager manager = Managers.getFileBackedTasksManager(pathCSV);*/
+/*        Subtask subtask3 = new Subtask("7", "qwerty", "NEW", 3);
 
-        TaskManager manager = Managers.getDefault();
-        // создаём простую задачу
         Task task1 = new Task("1", "buy a book on Java", "NEW");
+        manager.addTask(task1);
+        Task task2 = new Task("2", "buy a book on Java", "DONE");
+        manager.addTask(task2);
+        Epic task3 = new Epic("3", "learn english");
+        manager.addEpic(task3);
+        Subtask subtask1 = new Subtask("5", "qwerty", "NEW", 3);
+        manager.addSubtask(subtask1);
+        manager.getTaskById(1);
+        manager.getEpicById(3);
+        manager.getTaskById(2);
+        manager.getTaskById(1);
+        manager.addSubtask(subtask3);
+        manager.getSubtaskById(5);*/
+        // создаём простую задачу
+/*        Task task1 = new Task("1", "buy a book on Java", "NEW");
         Task task2 = new Task("2", "buy a book on Java", "DONE");
         manager.addTask(task1);
         manager.addTask(task2);
@@ -48,7 +66,7 @@ public class Main {
        manager.deleteTaskById(2);
        manager.deleteTaskById(1);
 
-        System.out.println(manager.getHistory());
+        System.out.println(manager.getHistory());*/
 
     }
 }

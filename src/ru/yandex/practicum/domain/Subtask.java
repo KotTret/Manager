@@ -14,7 +14,12 @@ public class Subtask extends Task {
         return idEpic;
     }
 
+
     @Override
+    public String toString() {
+        return id + "," + "Subtask" + "," + name + "," + status + "," + description + "," + idEpic;
+    }
+/*    @Override
     public String toString() {
         return "Subtask{" +
                 "IdEpic='" + idEpic + '\'' +
@@ -23,7 +28,7 @@ public class Subtask extends Task {
                 ", status='" + status + '\'' +
                 ", id=" + id +
                 '}';
-    }
+    }*/
 
     @Override
     public boolean equals(Object o) {
