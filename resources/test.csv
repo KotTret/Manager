@@ -1,6 +1,5 @@
 id,type,name,status,description,epic
 1,Task,1,NEW,buy a book on Java, 
 2,Task,2,DONE,buy a book on Java, 
-3,Epic,3,NEW,learn english, 
 
-1,3,2,
+2,1

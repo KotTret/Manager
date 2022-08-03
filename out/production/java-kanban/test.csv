@@ -1,0 +1,12 @@
+id,type,name,status,description,epic
+1,Task,1,NEW,buy a book on Java, 
+2,Task,2,DONE,buy a book on Java, 
+4,Epic,4,DONE,understand the task of this sprint, 
+3,Epic,3,IN_PROGRESS,learn english, 
+8,Subtask,8,DONE,qwerty,4
+9,Subtask,9,DONE,qwerty,4
+5,Subtask,5,NEW,qwerty,3
+6,Subtask,6,IN_PROGRESS,qwerty,3
+7,Subtask,7,NEW,qwerty,3
+
+3,2,5,6,1
