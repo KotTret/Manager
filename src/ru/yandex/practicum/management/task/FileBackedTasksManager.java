@@ -19,7 +19,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String separator = File.separator;
         String pathCSV = "resources" + separator + "test.csv";
         File file = new File(pathCSV);
-           FileBackedTasksManager fm = FileBackedTasksManager.loadFromFile(file);
+        FileBackedTasksManager fm = FileBackedTasksManager.loadFromFile(file);
 
 /*        TaskManager manager = Managers.getFileBackedTasksManager(file);
         Task task1 = new Task("1", "buy a book on Java", "NEW");
@@ -94,6 +94,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return history;
     }
 
+
     private void fromString(String line) {
         String[] splitTask = line.split(",");
 
@@ -103,30 +104,24 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String description = splitTask[4];
 
         switch (splitTask[1]) {
-            case "Task":
+            case "TASK":
                 Task task = new Task(name, description, status);
                 task.setId(idFromCSV);
-                if (this.id < idFromCSV) {
-                    this.id = idFromCSV;
-                }
+                findMaxId(idFromCSV);
                 tasks.put(idFromCSV, task);
                 break;
-            case "Epic":
+            case "EPIC":
                 Epic epic = new Epic(name, description);
                 epic.setStatus(Status.valueOf(status));
                 epic.setId(idFromCSV);
-                if (this.id < idFromCSV) {
-                    this.id = idFromCSV;
-                }
+                findMaxId(idFromCSV);
                 epics.put(idFromCSV, epic);
                 break;
-            case "Subtask":
+            case "SUBTASK":
                 Integer idEpic = Integer.valueOf(splitTask[5]);
                 Subtask subtask = new Subtask(name, description, status, idEpic);
                 subtask.setId(idFromCSV);
-                if (this.id < idFromCSV) {
-                    this.id = idFromCSV;
-                }
+                findMaxId(idFromCSV);
                 subtasks.put(idFromCSV, subtask);
                 epics.get(subtask.getIdEpic()).getListIdSubtask().add(subtask.getId());
                 break;
@@ -136,15 +131,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     private void save() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file.getPath(), StandardCharsets.UTF_8))) {
             bw.write(TABLE_HEADER);
-            for (Task task : getTasks().values()) {
+            for (Task task : tasks.values()) {
                 bw.newLine();
                 bw.write(task.toString());
             }
-            for (Epic epic : getEpics().values()) {
+            for (Epic epic : epics.values()) {
                 bw.newLine();
                 bw.write(epic.toString());
             }
-            for (Subtask subtask : getSubtasks().values()) {
+            for (Subtask subtask : subtasks.values()) {
                 bw.newLine();
                 bw.write(subtask.toString());
             }
@@ -157,12 +152,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private String historyToString(List<Task> history) {
+    private static String historyToString(List<Task> history) {
         List<String> idHistoryToString = new ArrayList<>();
-        for (Task task : getHistory()) {
+        for (Task task : history) {
             idHistoryToString.add(String.valueOf(task.getId()));
         }
         return String.join(",", idHistoryToString);
+    }
+
+    private void findMaxId(Integer idFromCSV) {
+        if (this.id < idFromCSV) {
+            this.id = idFromCSV;
+        }
     }
 
     @Override

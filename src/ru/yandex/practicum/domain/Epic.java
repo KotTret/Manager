@@ -23,7 +23,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return id + "," + "Epic" + "," + name + "," + status + "," + description + "," + " ";
+        return id + "," + "EPIC" + "," + name + "," + status + "," + description + "," + " ";
     }
 /*    @Override
     public String toString() {
