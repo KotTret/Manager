@@ -7,8 +7,11 @@ import ru.yandex.practicum.domain.Task;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 public interface TaskManager {
+
+    TreeSet<Task> getPrioritizedTasks();
 
     List<Task> getHistory();
 
@@ -48,4 +51,5 @@ public interface TaskManager {
 
     Map<Integer, Subtask> getSubtasks();
 
+    int getId();
 }

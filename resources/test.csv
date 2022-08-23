@@ -1,5 +1,0 @@
-id,type,name,status,description,epic
-1,TASK,1,NEW,buy a book on Java, 
-2,TASK,2,DONE,buy a book on Java, 
-
-2,1
