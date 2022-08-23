@@ -1,6 +1,0 @@
-id,type,name,status,description,epic,startTime,duration(min)
-1,TASK,One,NEW,Test  description, ,10.03.2022 22:12,30
-2,TASK,Two,DONE,Test  description, ,10.03.2022 23:12,30
-3,EPIC,One,NEW,Test  description, ,Время ещё не задано,0
-4,EPIC,Two,NEW,Test  description, ,Время ещё не задано,0
-
