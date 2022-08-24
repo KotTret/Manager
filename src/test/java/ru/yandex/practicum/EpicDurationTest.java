@@ -52,7 +52,7 @@ public class EpicDurationTest {
 
     @Test
     public void shouldReturnDurationWhenSeveralSubtasks() {
-        Duration expected = Duration.ofMinutes(170);
+        Duration expected = Duration.ofMinutes(120);
         manager.addEpic(epic);
         createAndAddSubtasks(Status.DONE, Status.NEW, Status.DONE);
         assertEquals(expected, epic.getDuration());
@@ -60,7 +60,7 @@ public class EpicDurationTest {
 
     @Test
     public void shouldReturnDurationWhenSubtaskDeletedFromMiddle() {
-        Duration expected = Duration.ofMinutes(170);
+        Duration expected = Duration.ofMinutes(80);
         manager.addEpic(epic);
         createAndAddSubtasks(Status.DONE, Status.NEW, Status.DONE);
         manager.deleteSubtaskById(3);
@@ -69,7 +69,7 @@ public class EpicDurationTest {
 
     @Test
     public void shouldReturnDurationWhenSubtaskDeletedFromEnd() {
-        Duration expected = Duration.ofMinutes(100);
+        Duration expected = Duration.ofMinutes(70);
         manager.addEpic(epic);
         createAndAddSubtasks(Status.DONE, Status.NEW, Status.DONE);
         manager.deleteSubtaskById(4);
@@ -78,7 +78,7 @@ public class EpicDurationTest {
 
     @Test
     public void shouldReturnDurationWhenSubtaskDeletedFromBeginning() {
-        Duration expected = Duration.ofMinutes(110);
+        Duration expected = Duration.ofMinutes(90);
         manager.addEpic(epic);
         createAndAddSubtasks(Status.DONE, Status.NEW, Status.DONE);
         manager.deleteSubtaskById(2);
@@ -86,8 +86,8 @@ public class EpicDurationTest {
     }
 
     @Test
-    public void shouldReturnDurationWhenWhenSubtaskUpdate() {
-        Duration expected = Duration.ofMinutes(190);
+    public void shouldReturnDurationWhenSubtaskUpdate() {
+        Duration expected = Duration.ofMinutes(130);
         manager.addEpic(epic);
         createAndAddSubtasks(Status.DONE, Status.NEW, Status.DONE);
         subtask3 = new Subtask("Qwerty", "qwerty", Status.DONE, 60, "12.02.2022 14:43", 1);

@@ -33,6 +33,7 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
     @Test
     void saveToFileAndLoadFromFileForEmptyListTest() {
         FileBackedTasksManager manager2 = FileBackedTasksManager.loadFromFile(file);
+        assertEquals(manager.getId(), manager.getId(), "Неверно восстановлен Id");
         assertEquals(manager, manager2, "Десериализация менеджера прошла с ошибкой");
     }
 
@@ -44,12 +45,14 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
         manager.getTaskById(1);
         manager.getEpicById(3);
         FileBackedTasksManager manager2 = FileBackedTasksManager.loadFromFile(file);
+        assertEquals(manager.getId(), manager.getId(), "Неверно восстановлен Id");
         assertEquals(manager.getHistory(), manager2.getHistory(), "Десериализация менеджера прошла с ошибкой History");
         assertEquals(manager.getTasks(), manager2.getTasks(), "Десериализация менеджера прошла с ошибкой Tasks");
         assertEquals(manager.getEpics(), manager2.getEpics(), "Десериализация менеджера прошла с ошибкой Epics");
         assertEquals(manager.getSubtasks(), manager2.getSubtasks(), "Десериализация менеджера прошла с ошибкой Subtasks");
         assertEquals(manager.getId(), manager2.getId(), "Десериализация менеджера прошла с ошибкой Id");
-
+        assertEquals(manager.getPrioritizedTasks(), manager2.getPrioritizedTasks(), "Десериализация менеджера прошла с ошибкой Id");
+        assertEquals(manager, manager2, "Десериализация менеджера прошла с ошибкой");
     }
 
     @Test
@@ -57,11 +60,13 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
         addTasks();
         addEpics();
         FileBackedTasksManager manager2 = FileBackedTasksManager.loadFromFile(file);
+        assertEquals(manager.getId(), manager.getId(), "Неверно восстановлен Id");
         assertEquals(manager.getHistory(), manager2.getHistory(), "Десериализация менеджера прошла с ошибкой History");
         assertEquals(manager.getTasks(), manager2.getTasks(), "Десериализация менеджера прошла с ошибкой Tasks");
         assertEquals(manager.getEpics(), manager2.getEpics(), "Десериализация менеджера прошла с ошибкой Epics");
         assertEquals(manager.getSubtasks(), manager2.getSubtasks(), "Десериализация менеджера прошла с ошибкой Subtasks");
         assertEquals(manager.getId(), manager2.getId(), "Десериализация менеджера прошла с ошибкой Id");
-        assertEquals(manager, manager2, "Десериализация менеджера прошла с ошибкой");
+        assertEquals(manager.getPrioritizedTasks(), manager2.getPrioritizedTasks(), "Десериализация менеджера прошла с ошибкой Id");
+         assertEquals(manager, manager2, "Десериализация менеджера прошла с ошибкой");
     }
 }

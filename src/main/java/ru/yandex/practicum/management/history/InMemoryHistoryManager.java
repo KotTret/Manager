@@ -5,11 +5,6 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    /*Не бей только :), да, в реализации где-то переборщил, можно было и проще, понимаю, но голова уже кипит.
-    И в тестах, да там, не все как в задании требуется сделал, просто были сомнения в необходимости лишних тестов.
-    и хочется уже конструктива увидеть, а то может налипил не того,
-    впринципе, основое что в задании требовалось сделал, поэтому и выслал на ревью :)
-    * */
     private final Map<Integer, Node> browsingHistoryTask = new HashMap<>();
     private Node head;
     private Node tail;

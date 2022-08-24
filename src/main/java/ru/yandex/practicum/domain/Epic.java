@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task implements Comparable<Task> {
-    private final List<Integer> listIdSubtask = new ArrayList<>();
+
+    private  List<Integer> listIdSubtask = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
         super(name, description, Status.NEW, 0, null);
@@ -22,12 +24,12 @@ public class Epic extends Task implements Comparable<Task> {
         this.status = status;
     }
 
-    public void setDuration() {
-        if (startTime == null || endTime == null) {
-            duration = Duration.ofMinutes(0);
-        } else {
-            duration = Duration.between(startTime, endTime);
-        }
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setListIdSubtask(List<Integer> listIdSubtask) {
+        this.listIdSubtask = listIdSubtask;
     }
 
     public void setStartTime(LocalDateTime startTime) {
@@ -46,5 +48,7 @@ public class Epic extends Task implements Comparable<Task> {
         return id + "," + "EPIC" + "," + name + "," + status + "," + description + "," + " " +
                 "," + getStartTime() + "," + duration.toMinutes();
     }
+
+
 
 }

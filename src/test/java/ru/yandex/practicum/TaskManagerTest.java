@@ -6,6 +6,7 @@ import ru.yandex.practicum.domain.Epic;
 import ru.yandex.practicum.domain.Subtask;
 import ru.yandex.practicum.domain.Task;
 
+import ru.yandex.practicum.exceptions.CollisionTaskException;
 import ru.yandex.practicum.management.task.TaskManager;
 
 import java.io.ByteArrayOutputStream;
@@ -214,70 +215,124 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(expectedList, actualList, "Неверно выведен список Subtasks для Epic");
     }
 
-    @Test
-    void getHistoryWhenListIsEmpty() {
-        manager.deleteAll();
-        assertTrue(manager.getHistory().isEmpty(), "Список истории не пустой");
-    }
-
-    @Test
-    void getHistoryWhenTaskViewRepeated() {
-        completeBrowsingHistory();
-        manager.getTaskById(1);
-        final List<Task> expectedList = List.of(epic1, subtask1, task1);
-        final List<Task> actualList = manager.getHistory();
-        assertEquals(3, actualList.size(), "Неверно выведен список истории");
-        assertEquals(expectedList, actualList, "Неверно выведен список истории");
-    }
-
-    @Test
-    void getHistoryWhenTaskDeletedFromBeginning() {
-        completeBrowsingHistory();
-        manager.deleteTaskById(1);
-        final List<Task> expectedList = List.of(epic1, subtask1);
-        final List<Task> actualList = manager.getHistory();
-        assertEquals(2, actualList.size(), "Неверно выведен список истории");
-        assertEquals(expectedList, actualList, "Неверно выведен список истории");
-    }
-
-    @Test
-    void getHistoryWhenTaskDeletedFromEnd() {
-        completeBrowsingHistory();
-        manager.deleteSubtaskById(5);
-        final List<Task> expectedList = List.of(task1, epic1);
-        final List<Task> actualList = manager.getHistory();
-        assertEquals(2, actualList.size(), "Неверно выведен список истории");
-        assertEquals(expectedList, actualList, "Неверно выведен список истории");
-    }
-
-    @Test
-    void getHistoryWhenTaskDeletedFromMiddle() {
-        completeBrowsingHistory();
-        manager.deleteEpicById(3);
-        final List<Task> expectedList = List.of(task1);
-        final List<Task> actualList = manager.getHistory();
-        assertEquals(expectedList, actualList, "Неверно выведен список истории");
-    }
 
     @Test
     void getPrioritizedTasksTest() {
         addAllTasks();
-        List<Task> list = List.of(task1, task2, epic1, epic2, subtask1, subtask2, subtask3);
+        List<Task> list = List.of(task1, task2, subtask1, subtask2, subtask3);
         final TreeSet<Task> expectedSet = new TreeSet<>(list);
         final TreeSet<Task> actualSet = manager.getPrioritizedTasks();
         List<Task>  expected = new ArrayList<>(expectedSet);
         List<Task> actual = new ArrayList<>(actualSet);
 
-        assertEquals(7, actualSet.size(), "Неверно выведен список задач по приоритету");
+        assertEquals(5, actualSet.size(), "Неверно выведен список задач по приоритету");
         assertEquals(expected, actual, "Неверно выведен список задач по приоритету");
     }
 
-
-    protected void completeBrowsingHistory() {
+    @Test
+    void shouldThrowExceptionWhenStartCollidesWithEndTimeOfTasksForAdd() {
         addAllTasks();
-        manager.getTaskById(1);
-        manager.getEpicById(3);
-        manager.getSubtaskById(5);
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 30, "10.03.2022 22:54");
+        Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 30, "12.02.2022 15:34", 3);
+
+        assertThrows(CollisionTaskException.class, () -> manager.addTask(newTask),
+                "Не выявлен случай: задача начинается до окончания другой задачи");
+        assertThrows(CollisionTaskException.class, () -> manager.addSubtask(newSubtask),
+                "Не выявлен случай: задача начинается до окончания другой задачи");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenEndCollidesWithStartTimeOfTasksForAdd() {
+        addAllTasks();
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 30, "10.03.2022 22:00");
+        Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 30, "12.02.2022 12:23", 3);
+
+        assertThrows(CollisionTaskException.class, () -> manager.addTask(newTask),
+                "Не выявлен случай: задача заканчивается после начала другой задачи");
+        assertThrows(CollisionTaskException.class, () -> manager.addSubtask(newSubtask),
+                "Не выявлен случай:  задача заканчивается после начала другой задачи");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenInternalCollidesTimeOfTasksForAdd() {
+        addAllTasks();
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 10, "10.03.2022 22:15");
+        Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 10, "12.02.2022 15:35", 3);
+
+        assertThrows(CollisionTaskException.class, () -> manager.addTask(newTask),
+                "Не выявлен случай: время задачи находится внутри времени другой задачи");
+        assertThrows(CollisionTaskException.class, () -> manager.addSubtask(newSubtask),
+                "Не выявлен случай: время задачи находится внутри времени другой задачи");
+
+    }
+
+    @Test
+    void shouldThrowExceptionWhenExternalCollidesTimeOfTasksForAdd() {
+        addAllTasks();
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 50, "10.03.2022 22:10");
+        Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 50, "12.02.2022 15:22", 3);
+
+        assertThrows(CollisionTaskException.class, () -> manager.addTask(newTask),
+                "Не выявлен случай: время другой задачи находися внутри времени добавленной задачи");
+        assertThrows(CollisionTaskException.class, () -> manager.addSubtask(newSubtask),
+                "Не выявлен случай: время другой задачи находися внутри времени добавленной задачи");
+
+    }
+
+    @Test
+    void shouldThrowExceptionWhenStartCollidesWithEndTimeOfTasksForUpdate() {
+        addAllTasks();
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 30, "10.03.2022 22:33");
+        Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 30, "12.02.2022 14:35", 3);
+        newTask.setId(2);
+        newSubtask.setId(5);
+
+        assertThrows(CollisionTaskException.class, () -> manager.updateTask(newTask),
+                "Не выявлен случай: задача начинается до окончания другой задачи");
+        assertThrows(CollisionTaskException.class, () -> manager.updateTask(newSubtask),
+                "Не выявлен случай: задача начинается до окончания другой задачи");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenEndCollidesWithStartTimeOfTasksUpdate() {
+        addAllTasks();
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 30, "10.03.2022 22:15");
+        Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 30, "12.02.2022 14:22", 3);
+        newTask.setId(2);
+        newSubtask.setId(5);
+
+        assertThrows(CollisionTaskException.class, () -> manager.updateTask(newTask),
+                "Не выявлен случай: задача заканчивается после начала другой задачи");
+        assertThrows(CollisionTaskException.class, () -> manager.updateTask(newSubtask),
+                "Не выявлен случай: задача заканчивается после начала другой задачи");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenInternalCollidesTimeOfTasksForUpdate() {
+        addAllTasks();
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 10, "10.03.2022 22:15");
+        Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 10, "12.02.2022 14:35", 3);
+        newTask.setId(2);
+        newSubtask.setId(5);
+
+        assertThrows(CollisionTaskException.class, () -> manager.updateTask(newTask),
+                "Не выявлен случай: время задачи находится внутри времени другой задачи");
+        assertThrows(CollisionTaskException.class, () -> manager.updateTask(newSubtask),
+                "Не выявлен случай: время задачи находится внутри времени другой задачи");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenExternalCollidesTimeOfTasksForUpdate() {
+        addAllTasks();
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 50, "10.03.2022 22:10");
+        Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 50, "12.02.2022 14:22", 3);
+        newTask.setId(2);
+        newSubtask.setId(5);
+
+        assertThrows(CollisionTaskException.class, () -> manager.updateTask(newTask),
+                "Не выявлен случай: время другой задачи находися внутри времени добавленной задачи");
+        assertThrows(CollisionTaskException.class, () -> manager.updateTask(newSubtask),
+                "Не выявлен случай: время другой задачи находися внутри времени добавленной задачи");
     }
 
     @AfterAll

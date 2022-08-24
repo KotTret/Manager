@@ -12,7 +12,6 @@ public class Task implements Comparable<Task> {
     protected Integer id;
     protected Duration duration;
     protected LocalDateTime startTime;
-    protected LocalDateTime endTime;
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     public Task(String name, String description, Status status, int duration, String startTime) {
@@ -102,16 +101,14 @@ public class Task implements Comparable<Task> {
 
     @Override
     public int compareTo(Task o) {
-        if (this.startTime == null) {
-            return 1;
+        if(this.startTime == null && o.startTime == null) {
+            return this.id - o.id;
         } else if (o.startTime == null) {
             return -1;
-        } else if (this.startTime.isBefore(o.startTime)) {
-            return -1;
-        } else if(this.startTime.equals(o.startTime) && this.equals(o)) {
-            return 0;
-        } else {
+        } else if (this.startTime == null) {
             return 1;
+        } else {
+            return this.startTime.compareTo(o.startTime);
         }
     }
 }

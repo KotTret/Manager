@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
@@ -78,11 +79,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 Task task = new Task(name, description, Status.valueOf(status), duration, startTime);
                 task.setId(idFromCSV);
                 tasks.put(idFromCSV, task);
+                prioritizedTasks.add(task);
                 break;
             case "EPIC":
                 Epic epic = new Epic(name, description);
                 epic.setStatus(Status.valueOf(status));
-           //     epic.setDuration(Duration.ofMinutes(duration));
                 if (startTime.equals("Время ещё не задано")) {
                     epic.setStartTime(null);
                 } else {
@@ -97,6 +98,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 subtask.setId(idFromCSV);
                 subtasks.put(idFromCSV, subtask);
                 epics.get(subtask.getIdEpic()).getListIdSubtask().add(subtask.getId());
+                prioritizedTasks.add(subtask);
                 break;
         }
     }
