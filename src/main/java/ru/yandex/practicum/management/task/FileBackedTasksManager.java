@@ -10,16 +10,16 @@ import ru.yandex.practicum.exceptions.ManagerSaveException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.DateTimeException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
-
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private final File file;
-    private static final String TABLE_HEADER = "id,type,name,status,description,epic,startTime,duration(min)";
+    private static final String TABLE_HEADER = "id,type,name,status,description,epic,startTime,duration(min),endTime";
 
     public FileBackedTasksManager(File file) {
         this.file = file;
@@ -72,6 +72,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String description = splitTask[4];
         int duration = Integer.parseInt(splitTask[7]);
         String startTime = splitTask[6];
+        String endTime = splitTask[8];
+        try {
+            LocalDateTime.parse(startTime, Task.formatter);
+        } catch (DateTimeException e) {
+            startTime = null;
+            endTime = null;
+        }
         findMaxId(idFromCSV);
 
         switch (splitTask[1]) {
@@ -84,11 +91,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             case "EPIC":
                 Epic epic = new Epic(name, description);
                 epic.setStatus(Status.valueOf(status));
-                if (startTime.equals("Время ещё не задано")) {
+                if (startTime == null) {
                     epic.setStartTime(null);
+                    epic.setEndTime(null);
                 } else {
                     epic.setStartTime(LocalDateTime.parse(startTime, Task.formatter));
+                    epic.setStartTime(LocalDateTime.parse(endTime, Task.formatter));
                 }
+                epic.setDuration(Duration.ofMinutes(duration));
                 epic.setId(idFromCSV);
                 epics.put(idFromCSV, epic);
                 break;

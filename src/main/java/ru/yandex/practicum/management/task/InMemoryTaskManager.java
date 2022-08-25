@@ -10,21 +10,20 @@ import ru.yandex.practicum.management.history.HistoryManager;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 public class InMemoryTaskManager implements TaskManager {
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
     protected final Map<Integer, Task> tasks = new HashMap<>();
     protected final Map<Integer, Epic> epics = new HashMap<>();
     protected final Map<Integer, Subtask> subtasks = new HashMap<>();
-    protected final TreeSet<Task> prioritizedTasks = new TreeSet<>();
+    protected final Set<Task> prioritizedTasks = new TreeSet<>();
 
     protected int id = 0;
 
-
-
-   private boolean checkForIntersectionOfTasks(Task newTask) {
+    private boolean checkForIntersectionOfTasks(Task newTask) {
+        if (newTask.getStartTime().equals("Время ещё не задано")) {
+            return true;
+        }
         LocalDateTime startTimeNewTask = LocalDateTime.parse(newTask.getStartTime(), Task.formatter);
         LocalDateTime endTimeNewTask = LocalDateTime.parse(newTask.getEndTime(), Task.formatter);
         for (Task oldTask : prioritizedTasks) {
@@ -35,15 +34,14 @@ public class InMemoryTaskManager implements TaskManager {
                 continue;
             } else if (!endTimeNewTask.isAfter(startTimeOldTask) || !startTimeNewTask.isBefore(endTimeOldTask)) {
                 continue;
-            } else {
-                throw new CollisionTaskException("Невозможно добавить/обновить задачу, это время занято");
             }
+            throw new CollisionTaskException("Невозможно добавить/обновить задачу, это время занято");
         }
         return true;
     }
 
     @Override
-    public TreeSet<Task> getPrioritizedTasks() {
+    public Set<Task> getPrioritizedTasks() {
         return new TreeSet<>(prioritizedTasks);
     }
 
@@ -173,7 +171,9 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Задач с таким идентификатором не найдено");
         } else {
             for (Integer i : epics.get(id).getListIdSubtask()) {
-                historyManager.remove(subtasks.remove(i).getId());
+                Subtask deletedSub = subtasks.remove(i);
+                historyManager.remove(deletedSub.getId());
+                prioritizedTasks.remove(deletedSub);
             }
             historyManager.remove(epics.remove(id).getId());
         }
@@ -205,8 +205,8 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = (Epic) task;
             epic.setListIdSubtask(epics.get(epic.getId()).getListIdSubtask());
             epics.put(task.getId(), (Epic) task);
-            this.setStatusEpic(epics.get(epic.getId()));
-            this.setTimeFrameAndDurationEpic(epics.get(epic.getId()));
+            setStatusEpic(epics.get(epic.getId()));
+            setTimeFrameAndDurationEpic(epics.get(epic.getId()));
 
         } else if (task instanceof Subtask) {
             if (!subtasks.containsKey(task.getId())) {
@@ -214,9 +214,11 @@ public class InMemoryTaskManager implements TaskManager {
             }
             Subtask subtask = (Subtask) task;
             if (checkForIntersectionOfTasks(subtask)) {
+                prioritizedTasks.remove(subtasks.get(subtask.getId()));
                 subtasks.put(subtask.getId(), subtask);
-                this.setStatusEpic(epics.get(subtask.getIdEpic()));
-                this.setTimeFrameAndDurationEpic(epics.get(subtask.getIdEpic()));
+                prioritizedTasks.add(subtask);
+                setStatusEpic(epics.get(subtask.getIdEpic()));
+                setTimeFrameAndDurationEpic(epics.get(subtask.getIdEpic()));
             }
 
         } else {
@@ -224,7 +226,9 @@ public class InMemoryTaskManager implements TaskManager {
                 return;
             }
             if (checkForIntersectionOfTasks(task)) {
+                prioritizedTasks.remove(tasks.get(task.getId()));
                 tasks.put(task.getId(), task);
+                prioritizedTasks.add(task);
             }
         }
     }
@@ -287,22 +291,34 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-
     private void setTimeFrameAndDurationEpic(Epic epic) {
         if (epic.getListIdSubtask().isEmpty()) {
             epic.setDuration(Duration.ofMinutes(0));
             epic.setEndTime(null);
             epic.setStartTime(null);
         } else {
-            List<String> startTimeSubtasks = epic.getListIdSubtask().stream().map(subtasks::get).map(Subtask::getStartTime)
-                    .filter(Objects::nonNull).sorted().collect(Collectors.toCollection(ArrayList::new));
-            List<String> endTimeSubtasks = epic.getListIdSubtask().stream().map(subtasks::get).map(Subtask::getEndTime)
-                    .filter(Objects::nonNull).sorted().collect(Collectors.toCollection(ArrayList::new));
+            Optional<String> startTimeSubtasks = epic.getListIdSubtask().stream().map(subtasks::get).map(Subtask::getStartTime)
+                    .filter(s -> !s.equals("Время ещё не задано")).sorted().findFirst();
+
+            Optional<String> endTimeSubtasks = epic.getListIdSubtask().stream().map(subtasks::get).map(Subtask::getStartTime)
+                    .filter(s -> !s.equals("Время ещё не задано")).sorted().reduce((first, second) -> second);
+
             long durationTask = epic.getListIdSubtask().stream().map(subtasks::get).map(Subtask::getDuration)
                     .map(Duration::toMinutes).mapToLong(Long::intValue).sum();
-            epic.setStartTime(LocalDateTime.parse(startTimeSubtasks.get(0), Task.formatter));
-            epic.setEndTime((LocalDateTime.parse(endTimeSubtasks.get(endTimeSubtasks.size() - 1), Task.formatter)));
-            epic.setDuration(Duration.ofMinutes(durationTask));
+            if (startTimeSubtasks.isEmpty()) {
+                epic.setStartTime(null);
+                epic.setEndTime(null);
+                epic.setDuration(Duration.ofMinutes(0));
+            }
+            if (endTimeSubtasks.isEmpty()) {
+                epic.setEndTime(null);
+            }
+            if (endTimeSubtasks.isPresent() && startTimeSubtasks.isPresent()) {
+                epic.setStartTime(LocalDateTime.parse(startTimeSubtasks.get(), Task.formatter));
+                epic.setEndTime(LocalDateTime.parse(endTimeSubtasks.get(), Task.formatter));
+                epic.setDuration(Duration.ofMinutes(durationTask));
+            }
+
         }
     }
 

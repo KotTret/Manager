@@ -2,8 +2,6 @@ package ru.yandex.practicum;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.domain.Epic;
-import ru.yandex.practicum.domain.Task;
 import ru.yandex.practicum.management.task.FileBackedTasksManager;
 import ru.yandex.practicum.management.task.Managers;
 
@@ -11,10 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
@@ -23,6 +18,8 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
     private final String pathCSV = s+"home"+s+"kot"+s+"dev"+s+"java-kanban"+s+"src"+s+"main"+s+"resources"+s+"test.csv";
     private File file = new File(pathCSV);
 
+/*    private final String pathCSV1 = s+"home"+s+"kot"+s+"dev"+s+"java-kanban"+s+"src"+s+"main"+s+"resources"+s+"test1.csv";
+    private File file1 = new File(pathCSV1);*/
 
     @BeforeEach
     public void beforeEach() throws IOException {
@@ -45,7 +42,7 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
         manager.getTaskById(1);
         manager.getEpicById(3);
         FileBackedTasksManager manager2 = FileBackedTasksManager.loadFromFile(file);
-        assertEquals(manager.getId(), manager.getId(), "Неверно восстановлен Id");
+        assertEquals(manager.getId(), manager2.getId(), "Неверно восстановлен Id");
         assertEquals(manager.getHistory(), manager2.getHistory(), "Десериализация менеджера прошла с ошибкой History");
         assertEquals(manager.getTasks(), manager2.getTasks(), "Десериализация менеджера прошла с ошибкой Tasks");
         assertEquals(manager.getEpics(), manager2.getEpics(), "Десериализация менеджера прошла с ошибкой Epics");

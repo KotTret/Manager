@@ -1,6 +1,5 @@
 package ru.yandex.practicum;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.domain.Epic;
 import ru.yandex.practicum.domain.Subtask;
@@ -9,16 +8,12 @@ import ru.yandex.practicum.domain.Task;
 import ru.yandex.practicum.exceptions.CollisionTaskException;
 import ru.yandex.practicum.management.task.TaskManager;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
 
-    private static ByteArrayOutputStream output = new ByteArrayOutputStream();
 
     protected TaskManager manager;
     protected Task task1;
@@ -69,6 +64,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
 
+    @Test
+    void addAndGetTasksTestWhenTimeOfSubtasksIsNull() {
+        addEpics();
+        subtask1 = new Subtask("Qwerty", "qwerty", Status.NEW, 30, null, 1);
+        manager.addSubtask(subtask1);
+        assertEquals("Время ещё не задано", epic1.getEndTime());
+        assertEquals("Время ещё не задано", epic1.getStartTime());
+
+    }
 
     @Test
      void addAndGetTasksTest() {
@@ -106,11 +110,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void addAndGetSubtasksTest() {
 
         subtask1 = new Subtask("OneSubtask", "Test  description",Status.NEW, 30, "12.02.2022 12:33", 1);
-        System.setOut(new PrintStream(output));
         manager.addSubtask(subtask1);
-        assertEquals("Данный Subtask не подходит ни под один Epic", output.toString().trim());
-        output = new ByteArrayOutputStream();
-
+        assertEquals(0, manager.getSubtasks().size(), "Задача не добавилась, Epic еще нет");
 
         addSubtasksAndEpics();
         final int subtaskId = manager.getId();
@@ -128,20 +129,19 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteTasksTest() {
-        System.setOut(new PrintStream(output));
+        int unexpectedSize = 0;
+
         manager.deleteTaskById(2);
-        assertEquals("Задач в списке нет", output.toString().trim());
-        output = new ByteArrayOutputStream();
+        assertEquals(unexpectedSize, manager.getTasks().size(), "Список задач должен быть пустым");
 
         addTasks();
-
-        System.setOut(new PrintStream(output));
+        unexpectedSize = 2;
         manager.deleteTaskById(3);
-        assertEquals("Задач с таким идентификатором не найдено", output.toString().trim());
-        output = new ByteArrayOutputStream();
+        assertEquals(unexpectedSize, manager.getTasks().size(),
+                "Список задач не должен измениться, задачи с таким id не в списке");
+
 
         manager.deleteTaskById(1);
-        final int unexpectedSize = 2;
         assertNotEquals(unexpectedSize, manager.getTasks().size(), "Задача не удалена");
 
         manager.deleteAllTask();
@@ -150,19 +150,18 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteEpicsTest() {
-        System.setOut(new PrintStream(output));
+        int unexpectedSize = 0;
         manager.deleteEpicById(2);
-        assertEquals("Задач в списке нет", output.toString().trim());
-        output = new ByteArrayOutputStream();
+        assertEquals(unexpectedSize, manager.getEpics().size(), "Список задач должен быть пустым");
 
         addSubtasksAndEpics();
-        System.setOut(new PrintStream(output));
+        unexpectedSize = 2;
         manager.deleteEpicById(3);
-        assertEquals("Задач с таким идентификатором не найдено", output.toString().trim());
-        output = new ByteArrayOutputStream();
+        assertEquals(unexpectedSize, manager.getEpics().size(),
+                "Список задач не должен измениться, задачи с таким id не в списке");
 
         manager.deleteEpicById(1);
-        final int unexpectedSize = 2;
+        unexpectedSize = 1;
         assertNotEquals(unexpectedSize, manager.getTasks().size(), "Задача не удалена");
 
         manager.deleteAllEpic();
@@ -172,19 +171,18 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteSubtasksTest() {
-        System.setOut(new PrintStream(output));
+        int unexpectedSize = 0;
         manager.deleteSubtaskById(2);
-        assertEquals("Задач в списке нет", output.toString().trim());
-        output = new ByteArrayOutputStream();
+        assertEquals(unexpectedSize, manager.getSubtasks().size(), "Список задач должен быть пустым");
 
         addSubtasksAndEpics();
-        System.setOut(new PrintStream(output));
         manager.deleteSubtaskById(7);
-        assertEquals("Задач с таким идентификатором не найдено", output.toString().trim());
-        output = new ByteArrayOutputStream();
+        unexpectedSize = 3;
+        assertEquals(unexpectedSize, manager.getSubtasks().size(),
+                "Список задач не должен измениться, задачи с таким id не в списке");
+
 
         manager.deleteSubtaskById(1);
-        final int unexpectedSize = 3;
         assertNotEquals(unexpectedSize, manager.getTasks().size(), "Задача не удалена");
 
         manager.deleteAllSubtask();
@@ -197,17 +195,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getAllSubtaskOfEpicTest() {
-
-        System.setOut(new PrintStream(output));
+        int unexpectedSize = 0;
         manager.getAllSubtaskOfEpic(3);
-        assertEquals("Задач с таким идентификатором не найдено", output.toString().trim());
-        output = new ByteArrayOutputStream();
+        assertEquals(unexpectedSize, manager.getSubtasks().size(), "Список задач должен быть пустым, Epics нет");
 
         addEpics();
-        System.setOut(new PrintStream(output));
         manager.getAllSubtaskOfEpic(2);
-        assertEquals("Подзадач в списке нет", output.toString().trim());
-        output = new ByteArrayOutputStream();
+        assertEquals(unexpectedSize, manager.getSubtasks().size(),
+                "Список задач должен быть пустым, Subtasks еще не добавлены");
 
         addSubtasksAndEpics();
         final List<Subtask> expectedList = List.of(subtask1, subtask2);
@@ -221,7 +216,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         addAllTasks();
         List<Task> list = List.of(task1, task2, subtask1, subtask2, subtask3);
         final TreeSet<Task> expectedSet = new TreeSet<>(list);
-        final TreeSet<Task> actualSet = manager.getPrioritizedTasks();
+        final Set<Task> actualSet = manager.getPrioritizedTasks();
         List<Task>  expected = new ArrayList<>(expectedSet);
         List<Task> actual = new ArrayList<>(actualSet);
 
@@ -232,7 +227,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void shouldThrowExceptionWhenStartCollidesWithEndTimeOfTasksForAdd() {
         addAllTasks();
-        Task newTask = new Task("Two", "Test  description", Status.NEW, 30, "10.03.2022 22:54");
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 30, "10.03.2022 22:33");
         Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 30, "12.02.2022 15:34", 3);
 
         assertThrows(CollisionTaskException.class, () -> manager.addTask(newTask),
@@ -335,9 +330,31 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 "Не выявлен случай: время другой задачи находися внутри времени добавленной задачи");
     }
 
-    @AfterAll
-    static void afterAll() throws IOException {
-        output.close();
+    @Test
+    void shouldChangeListOfPrioritizedTasksWhenUpdateTask() {
+        addAllTasks();
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 50, "11.03.2022 22:10");
+        Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 50, "13.02.2022 14:22", 3);
+        newTask.setId(2);
+        newSubtask.setId(5);
+        manager.updateTask(newTask);
+        manager.updateTask(newSubtask);
+
+        System.out.println(manager.getPrioritizedTasks());
+
+        assertEquals(5, manager.getPrioritizedTasks().size(),
+                "При обновлении задач список приоритетов обновился неверно");
     }
 
+    @Test
+    void shouldIncreaseListOfPrioritizedTasksWhenAddTask() {
+        addAllTasks();
+        Task newTask = new Task("Two", "Test  description", Status.NEW, 50, "11.03.2022 22:10");
+        Subtask newSubtask = new Subtask("Qwerty", "qwerty", Status.NEW, 50, "13.02.2022 14:22", 3);
+        manager.addSubtask(newSubtask);
+        manager.addTask(newTask);
+
+        assertEquals(7, manager.getPrioritizedTasks().size(),
+                "При обновлении задач список приоритетов обновился неверно");
+    }
 }

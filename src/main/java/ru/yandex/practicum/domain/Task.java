@@ -36,7 +36,6 @@ public class Task implements Comparable<Task> {
         } else {
             return startTime.format(formatter);
         }
-
     }
 
     public String getEndTime() {
@@ -47,8 +46,15 @@ public class Task implements Comparable<Task> {
         }
     }
 
-    public DateTimeFormatter getFormatter() {
-        return formatter;
+    public void setStartTime(LocalDateTime startTime) {
+        if (startTime == null) {
+            return;
+        }
+        this.startTime = startTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
     }
 
     public String getName() {
@@ -74,7 +80,7 @@ public class Task implements Comparable<Task> {
     @Override
     public String toString() {
         return id + "," + "TASK" + "," + name + "," + status + "," + description + ","
-                + " " + "," + getStartTime() + ","  + duration.toMinutes();
+                + " " + "," + getStartTime() + ","  + duration.toMinutes() + "," + getEndTime();
     }
 
     @Override
@@ -87,7 +93,9 @@ public class Task implements Comparable<Task> {
         if (!name.equals(task.name)) return false;
         if (!description.equals(task.description)) return false;
         if (status != task.status) return false;
-        return id.equals(task.id);
+        if (!id.equals(task.id)) return false;
+        if (!duration.equals(task.duration)) return false;
+        return getStartTime().equals(task.getStartTime());
     }
 
     @Override
@@ -96,6 +104,8 @@ public class Task implements Comparable<Task> {
         result = 31 * result + description.hashCode();
         result = 31 * result + status.hashCode();
         result = 31 * result + id.hashCode();
+        result = 31 * result + duration.hashCode();
+        result = 31 * result + startTime.hashCode();
         return result;
     }
 

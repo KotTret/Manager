@@ -18,7 +18,7 @@ public class Subtask extends Task implements Comparable<Task> {
     @Override
     public String toString() {
         return id + "," + "SUBTASK" + "," + name + "," + status + "," + description + "," + idEpic + "," +
-                getStartTime() + ","  + duration.toMinutes();
+                getStartTime() + ","  + duration.toMinutes() + "," + getEndTime();
     }
 
     @Override
@@ -29,13 +29,13 @@ public class Subtask extends Task implements Comparable<Task> {
 
         Subtask subtask = (Subtask) o;
 
-        return idEpic.equals(subtask.idEpic);
+        return idEpic != null ? idEpic.equals(subtask.idEpic) : subtask.idEpic == null;
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + idEpic.hashCode();
+        result = 31 * result + (idEpic != null ? idEpic.hashCode() : 0);
         return result;
     }
 }
