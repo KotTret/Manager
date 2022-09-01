@@ -69,7 +69,7 @@ public class Task implements Comparable<Task> {
         return status;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

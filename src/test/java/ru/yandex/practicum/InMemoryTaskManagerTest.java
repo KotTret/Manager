@@ -8,6 +8,6 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @BeforeEach
     void beforeEach() {
-        manager = Managers.getDefault();
+        manager = Managers.getInMemoryTaskManager();
     }
 }

@@ -25,7 +25,7 @@ public class HistoryManagerTest {
 
     @BeforeEach
     void beforeEach() {
-        manager = Managers.getDefault();
+        manager = Managers.getInMemoryTaskManager();
     }
 
     protected void  addAllTasks() {

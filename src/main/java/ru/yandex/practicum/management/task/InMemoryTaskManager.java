@@ -20,7 +20,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected int id = 0;
 
-    private boolean checkForIntersectionOfTasks(Task newTask) {
+    private boolean checkForIntersectionOfTasks(Task newTask) throws CollisionTaskException{
         if (newTask.getStartTime().equals("Время ещё не задано")) {
             return true;
         }
@@ -292,7 +292,31 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void setTimeFrameAndDurationEpic(Epic epic) {
-        if (epic.getListIdSubtask().isEmpty()) {
+        LocalDateTime startEpic = null;
+        LocalDateTime endTimeEpic = null;
+        int durationEpic = 0;
+
+        for (int idSubtask : epic.getListIdSubtask()) {
+            Subtask subtask = subtasks.get(idSubtask);
+            if (!subtask.getStartTime().equals("Время ещё не задано")) {
+                LocalDateTime startTime = LocalDateTime.parse(subtask.getStartTime(), Task.formatter);
+                LocalDateTime endTime = LocalDateTime.parse(subtask.getEndTime(), Task.formatter);
+
+                if (startEpic == null || startTime.isBefore(startEpic)) {
+                    startEpic = startTime;
+                }
+
+                if (endTimeEpic == null || endTime.isAfter(endTimeEpic)) {
+                    endTimeEpic = endTime;
+                }
+                durationEpic += subtask.getDuration().toMinutes();
+            }
+        }
+        epic.setStartTime(startEpic);
+        epic.setEndTime(endTimeEpic);
+        epic.setDuration(Duration.ofMinutes(durationEpic));
+
+/*        if (epic.getListIdSubtask().isEmpty()) {
             epic.setDuration(Duration.ofMinutes(0));
             epic.setEndTime(null);
             epic.setStartTime(null);
@@ -319,7 +343,7 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.setDuration(Duration.ofMinutes(durationTask));
             }
 
-        }
+        }*/
     }
 
     public int getId() {

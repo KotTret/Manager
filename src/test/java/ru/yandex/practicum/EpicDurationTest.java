@@ -21,14 +21,14 @@ public class EpicDurationTest {
 
     @BeforeEach
     public void beforeEach() {
-        manager = Managers.getDefault();
+        manager = Managers.getInMemoryTaskManager();
         epic = new Epic("One", "learn english");
     }
 
     private void createAndAddSubtasks(Status  s1, Status s2, Status s3) {
         subtask1 = new Subtask("Qwerty", "qwerty", s1, 30, "12.02.2022 12:33", 1);
         subtask2 = new Subtask("qazd3", "qwerty", s2, 40, "12.02.2022 13:33", 1);
-        subtask3 = new Subtask("asd", "qwerty", s3, 50, "12.02.2022 14:33", 1);
+        subtask3 = new Subtask("asd", "qwerty", s3, 50, "12.02.2022 11:33", 1);
         manager.addSubtask(subtask1);
         manager.addSubtask(subtask2);
         manager.addSubtask(subtask3);

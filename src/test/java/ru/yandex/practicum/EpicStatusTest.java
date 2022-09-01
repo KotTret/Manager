@@ -20,7 +20,7 @@ class EpicStatusTest {
 
     @BeforeEach
     public void beforeEach() {
-        manager = Managers.getDefault();
+        manager = Managers.getInMemoryTaskManager();
         epic = new Epic("One", "learn english");
     }
 
