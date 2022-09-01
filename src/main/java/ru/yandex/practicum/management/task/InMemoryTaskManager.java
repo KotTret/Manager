@@ -240,6 +240,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.clear();
         historyManager.clear();
         prioritizedTasks.clear();
+        id = 0;
     }
 
     @Override

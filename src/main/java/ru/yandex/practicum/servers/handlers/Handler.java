@@ -16,7 +16,7 @@ import java.util.Map;
 
 
 abstract class Handler implements HttpHandler {
-    protected HTTPTaskManager manager = (HTTPTaskManager) HttpTaskServer.getManager();
+    protected HTTPTaskManager manager = (HTTPTaskManager) HttpTaskServer.manager;
     protected Gson gson;
     protected String response;
     protected String method;

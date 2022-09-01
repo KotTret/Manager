@@ -50,7 +50,7 @@ public class HTTPTaskServerTest {
         httpTaskServer = new HttpTaskServer();
         httpTaskServer.createAndStartServer();
         client = HttpClient.newHttpClient();
-        manager = HttpTaskServer.getManager();
+        manager = HttpTaskServer.manager;
         task1 = new Task("one", "qwerty", Status.DONE, 30, "13.03.2022 12:33");
         task2 = new Task("one", "qwerty", Status.DONE, 30, "14.02.2022 12:33");
         epic1 = new Epic("One", "learn english");
@@ -70,8 +70,10 @@ public class HTTPTaskServerTest {
 
     @AfterEach
       void afterEach() {
+        HttpTaskServer.manager.deleteAll();
         kvServer.stop();
         httpTaskServer.stop();
+
     }
 
     @BeforeAll
@@ -258,7 +260,7 @@ public class HTTPTaskServerTest {
     @Test
     void checkSubtasksHandlerWhenPOSTRequestToAdd() throws IOException, InterruptedException {
         URI url = URI.create(urlTaskServer + "tasks/subtasks");
-        Subtask newSubtask = new Subtask("okoko", "qwerty", Status.DONE, 30, "12.02.2022 12:33", 4);
+        Subtask newSubtask = new Subtask("okoko", "qwerty", Status.DONE, 30, "12.04.2022 12:33", 4);
         String newTaskJson = gson.toJson(newSubtask);
         HttpRequest request = HttpRequest.newBuilder().uri(url)
                 .POST(HttpRequest.BodyPublishers.ofString(newTaskJson))
@@ -278,7 +280,7 @@ public class HTTPTaskServerTest {
                 .POST(HttpRequest.BodyPublishers.ofString(newTaskJson))
                 .header("Content-Type", "application/json").build();
         client.send(request, HttpResponse.BodyHandlers.ofString());
-        Task actual = manager.getTaskById(5);
+        Task actual = manager.getSubtaskById(5);
         assertEquals(newSubtask, actual, "Задача не добавлена");
         assertEquals(3, manager.getSubtasks().size(), "Задача не добавлена");
     }

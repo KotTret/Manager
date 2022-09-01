@@ -63,7 +63,9 @@ public class SubtasksHandler extends Handler implements HttpHandler {
 
     private void createMappingForPOST(String idNewTask,  String bodyTask) {
         Subtask newTask = gson.fromJson(bodyTask, Subtask.class);
-        if (newTask.getIdEpic() == null || manager.getEpics().containsKey(newTask.getIdEpic())) {}
+        if (newTask.getIdEpic() == null || manager.getEpics().containsKey(newTask.getIdEpic())) {
+            rCode = 400;
+        }
         if (idNewTask == null) {
             try {
                 manager.addSubtask(newTask);

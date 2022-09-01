@@ -14,7 +14,7 @@ public class HttpTaskServer {
     HttpServer httpServer;
     private static final int PORT = 8080;
     private static final String url = "http://localhost:8078/";
-    private static final TaskManager manager = Managers.getDefault(url);
+    public static final TaskManager manager = Managers.getDefault(url);
 
     public void createAndStartServer() throws IOException {
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
@@ -29,10 +29,6 @@ public class HttpTaskServer {
 
     public void stop() {
         httpServer.stop(1);
-    }
-
-    public static TaskManager getManager() {
-        return manager;
     }
 
 }
