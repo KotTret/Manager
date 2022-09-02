@@ -30,7 +30,7 @@ public class KVTaskClient {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (!(response.statusCode() == 200)) {
-              throw new CollisionTaskException("Что-то пошло не так. Сервер вернул код состояния: \" + response.statusCode()");
+              throw new CollisionTaskException("Что-то пошло не так. Сервер вернул код состояния: " + response.statusCode());
             }
         } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
             System.out.println("Во время выполнения запроса возникла ошибка.\n" +
@@ -64,7 +64,9 @@ public class KVTaskClient {
     }
 
     private String register(String url) {
-        URI urlRegister = URI.create(url + "register");
+        return "DEBUG";
+    }
+/*        URI urlRegister = URI.create(url + "register");
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .uri(urlRegister)
@@ -78,5 +80,5 @@ public class KVTaskClient {
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
             return null;
         }
-    }
+    }*/
 }
