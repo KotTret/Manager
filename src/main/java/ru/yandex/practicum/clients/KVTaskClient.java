@@ -1,9 +1,8 @@
 package ru.yandex.practicum.clients;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
+import ru.yandex.practicum.exceptions.CollisionTaskException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,10 +29,8 @@ public class KVTaskClient {
                 .build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-              //  System.out.println("Состояние обновлено");
-            } else {
-              //  System.out.println("Что-то пошло не так. Сервер вернул код состояния: " + response.statusCode());
+            if (!(response.statusCode() == 200)) {
+              throw new CollisionTaskException("Что-то пошло не так. Сервер вернул код состояния: \" + response.statusCode()");
             }
         } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
             System.out.println("Во время выполнения запроса возникла ошибка.\n" +
@@ -65,8 +62,6 @@ public class KVTaskClient {
         }
 
     }
-
-
 
     private String register(String url) {
         URI urlRegister = URI.create(url + "register");

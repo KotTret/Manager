@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.domain.Epic;
 import ru.yandex.practicum.domain.Subtask;
 import ru.yandex.practicum.domain.Task;
-import ru.yandex.practicum.management.task.Managers;
 import ru.yandex.practicum.management.task.TaskManager;
 import ru.yandex.practicum.servers.HttpTaskServer;
 import ru.yandex.practicum.servers.KVServer;
@@ -21,11 +20,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HTTPTaskServerTest {
     private final String urlKVServer = "http://localhost:8078/";
@@ -161,6 +159,7 @@ public class HTTPTaskServerTest {
 
         String expected = gson.toJson(manager.getTasks());
 
+        assertTrue(manager.getTasks().isEmpty(), "Удаление не произошло");
         assertEquals(expected, actual, "Удаление не произошло");
     }
 
@@ -182,7 +181,7 @@ public class HTTPTaskServerTest {
         HttpRequest request = HttpRequest.newBuilder().uri(url)
                 .POST(HttpRequest.BodyPublishers.ofString(newTaskJson))
                 .header("Content-Type", "application/json").build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(3, manager.getTasks().size(), "Задача не добавлена");
     }
@@ -196,10 +195,10 @@ public class HTTPTaskServerTest {
         HttpRequest request = HttpRequest.newBuilder().uri(url)
                 .POST(HttpRequest.BodyPublishers.ofString(newTaskJson))
                 .header("Content-Type", "application/json").build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        client.send(request, HttpResponse.BodyHandlers.ofString());
         Task actual = manager.getTaskById(1);
-        assertEquals(newTask, actual, "Задача не добавлена");
-        assertEquals(2, manager.getTasks().size(), "Задача не добавлена");
+        assertEquals(newTask, actual, "Задача не обновлена");
+        assertEquals(2, manager.getTasks().size(), "Задача не обновлена");
     }
 
     @Test
@@ -232,7 +231,7 @@ public class HTTPTaskServerTest {
 
     @Test
     void checkSubtasksHandlerWhenDELETERequestAllSubtasks() throws IOException, InterruptedException {
-        URI url = URI.create(urlTaskServer + "tasks/subtasks");
+        URI url = URI.create(urlTaskServer + "tasks/subtask");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE()
                 .header("Content-Type", "application/json").build();
         client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -244,12 +243,13 @@ public class HTTPTaskServerTest {
 
         String expected = gson.toJson(manager.getSubtasks());
 
+        assertTrue(manager.getSubtasks().isEmpty(), "Удаление не произошло");
         assertEquals(expected, actual, "Удаление не произошло");
     }
 
     @Test
     void checkSubtasksHandlerWhenDELETERequestById() throws IOException, InterruptedException {
-        URI url = URI.create(urlTaskServer + "tasks/subtasks?id=6");
+        URI url = URI.create(urlTaskServer + "tasks/subtask?id=6");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE()
                 .header("Content-Type", "application/json").build();
         client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -259,7 +259,7 @@ public class HTTPTaskServerTest {
 
     @Test
     void checkSubtasksHandlerWhenPOSTRequestToAdd() throws IOException, InterruptedException {
-        URI url = URI.create(urlTaskServer + "tasks/subtasks");
+        URI url = URI.create(urlTaskServer + "tasks/subtask");
         Subtask newSubtask = new Subtask("okoko", "qwerty", Status.DONE, 30, "12.04.2022 12:33", 4);
         String newTaskJson = gson.toJson(newSubtask);
         HttpRequest request = HttpRequest.newBuilder().uri(url)
@@ -272,7 +272,7 @@ public class HTTPTaskServerTest {
 
     @Test
     void checkSubtasksHandlerWhenPOSTRequestToUpdate() throws IOException, InterruptedException {
-        URI url = URI.create(urlTaskServer + "tasks/subtasks?id=5");
+        URI url = URI.create(urlTaskServer + "tasks/subtask?id=5");
         Subtask newSubtask = new Subtask("okoko", "qwerty", Status.DONE, 30, "12.02.2022 12:33", 4);
         newSubtask.setId(5);
         String newTaskJson = gson.toJson(newSubtask);
@@ -281,7 +281,109 @@ public class HTTPTaskServerTest {
                 .header("Content-Type", "application/json").build();
         client.send(request, HttpResponse.BodyHandlers.ofString());
         Task actual = manager.getSubtaskById(5);
-        assertEquals(newSubtask, actual, "Задача не добавлена");
-        assertEquals(3, manager.getSubtasks().size(), "Задача не добавлена");
+        assertEquals(newSubtask, actual, "Задача не обновлена");
+        assertEquals(3, manager.getSubtasks().size(), "Задача не обновлена");
+    }
+
+    @Test
+    void checkEpicsHandlerWhenGETRequestAllEpics() throws IOException, InterruptedException {
+        URI url = URI.create(urlTaskServer + "tasks/epic");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).GET()
+                .header("Content-Type", "application/json").build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonElement jsonElement = JsonParser.parseString(response.body());
+        String actual = gson.toJson(jsonElement);
+
+        String expected = gson.toJson(manager.getEpics());
+
+        assertEquals(expected, actual, "Получен не верный Json с задачами");
+    }
+
+    @Test
+    void checkEpicsHandlerWhenGETRequestById() throws IOException, InterruptedException {
+        URI url = URI.create(urlTaskServer + "tasks/epic?id=4");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).GET()
+                .header("Content-Type", "application/json").build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonElement jsonElement = JsonParser.parseString(response.body());
+        String actual = gson.toJson(jsonElement);
+
+        String expected = gson.toJson(manager.getEpicById(4));
+
+        assertEquals(expected, actual, "Получен не верный Json с задачами");
+    }
+
+    @Test
+    void checkEpicsHandlerWhenDELETERequestAllEpics() throws IOException, InterruptedException {
+        URI url = URI.create(urlTaskServer + "tasks/epic");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE()
+                .header("Content-Type", "application/json").build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+        request = HttpRequest.newBuilder().uri(url).GET()
+                .header("Content-Type", "application/json").build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonElement jsonElement = JsonParser.parseString(response.body());
+        String actual = gson.toJson(jsonElement);
+
+        String expected = gson.toJson(manager.getEpics());
+
+        assertTrue(manager.getEpics().isEmpty(), "Удаление не произошло");
+        assertEquals(expected, actual, "Удаление не произошло");
+    }
+
+    @Test
+    void checkEpicsHandlerWhenDELETERequestById() throws IOException, InterruptedException {
+        URI url = URI.create(urlTaskServer + "tasks/epic?id=4");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE()
+                .header("Content-Type", "application/json").build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(1, manager.getEpics().size(), "Удаление не произошло");
+    }
+
+    @Test
+    void checkEpicsHandlerWhenPOSTRequestToAdd() throws IOException, InterruptedException {
+        URI url = URI.create(urlTaskServer + "tasks/epic");
+        Epic newEpic = new Epic("olololo", "qwerty");
+        String newTaskJson = gson.toJson(newEpic);
+        HttpRequest request = HttpRequest.newBuilder().uri(url)
+                .POST(HttpRequest.BodyPublishers.ofString(newTaskJson))
+                .header("Content-Type", "application/json").build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(3, manager.getEpics().size(), "Задача не добавлена");
+    }
+
+    @Test
+    void checEpicsHandlerWhenPOSTRequestToUpdate() throws IOException, InterruptedException {
+        URI url = URI.create(urlTaskServer + "tasks/epic?id=3");
+        Epic newEpic = new Epic("olololo", "qwerty");
+        newEpic.setId(3);
+        Epic oldEpic = manager.getEpicById(3);
+        String newTaskJson = gson.toJson(newEpic);
+        HttpRequest request = HttpRequest.newBuilder().uri(url)
+                .POST(HttpRequest.BodyPublishers.ofString(newTaskJson))
+                .header("Content-Type", "application/json").build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+        Task actual = manager.getEpicById(3);
+        assertNotEquals(oldEpic, actual, "Задача не обновлена");
+        assertEquals(2, manager.getEpics().size(), "Задача не обновлена");
+    }
+
+    @Test
+    void checkHistoryHandlerWhenGETRequest() throws IOException, InterruptedException {
+        manager.getTaskById(1);
+        manager.getEpicById(3);
+        URI url = URI.create(urlTaskServer + "tasks/history");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).GET()
+                .header("Content-Type", "application/json").build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonElement jsonElement = JsonParser.parseString(response.body());
+        String actual = gson.toJson(jsonElement);
+
+        String expected = gson.toJson(manager.getHistory());
+
+        assertEquals(2, manager.getHistory().size());
+        assertEquals(expected, actual, "Получен не верный Json с историей");
     }
 }

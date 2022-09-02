@@ -21,14 +21,13 @@ abstract class Handler implements HttpHandler {
     protected String response;
     protected String method;
     protected Headers headers;
-    int rCode;
+    protected int rCode;
     protected String bodyTask;
     protected String idNewTask;
 
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        manager.loadFromServer();
         gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .serializeNulls()

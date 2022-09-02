@@ -7,14 +7,11 @@ import ru.yandex.practicum.clients.KVTaskClient;
 import ru.yandex.practicum.domain.Epic;
 import ru.yandex.practicum.domain.Subtask;
 import ru.yandex.practicum.domain.Task;
-import ru.yandex.practicum.management.history.HistoryManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-
-public class HTTPTaskManager extends InMemoryTaskManager{
+public class HTTPTaskManager extends InMemoryTaskManager {
 
     private final KVTaskClient kvTaskClient;
     private static Gson gson;
@@ -23,14 +20,6 @@ public class HTTPTaskManager extends InMemoryTaskManager{
     private final String subtasksKey = "subtasks";
     private final String historyKey = "history";
 
-
-/*    protected final HistoryManager historyManager = Managers.getDefaultHistory();
-    protected final Map<Integer, Task> tasks = new HashMap<>();
-    protected final Map<Integer, Epic> epics = new HashMap<>();
-    protected final Map<Integer, Subtask> subtasks = new HashMap<>();
-    protected final Set<Task> prioritizedTasks = new TreeSet<>();
-
-    protected int id = 0;*/
 
     public HTTPTaskManager(String url) {
         kvTaskClient = new KVTaskClient(url);
@@ -58,9 +47,10 @@ public class HTTPTaskManager extends InMemoryTaskManager{
     public void loadFromServer() {
 
         String tasksJson = kvTaskClient.load(tasksKey);
-        HashMap<Integer,Task> tasksFromServer = gson.fromJson(tasksJson, new TypeToken<HashMap<Integer, Task>>(){}.getType());
+        HashMap<Integer, Task> tasksFromServer = gson.fromJson(tasksJson, new TypeToken<HashMap<Integer, Task>>() {
+        }.getType());
         if (tasksFromServer != null) {
-            for (Task task: tasksFromServer.values()) {
+            for (Task task : tasksFromServer.values()) {
                 this.tasks.put(task.getId(), task);
                 findMaxId(task.getId());
                 prioritizedTasks.add(task);
@@ -68,18 +58,20 @@ public class HTTPTaskManager extends InMemoryTaskManager{
         }
 
         String epicJson = kvTaskClient.load(epicsKey);
-        HashMap<Integer,Epic> epicsFromServer = gson.fromJson(epicJson, new TypeToken<HashMap<Integer, Epic>>(){}.getType());
+        HashMap<Integer, Epic> epicsFromServer = gson.fromJson(epicJson, new TypeToken<HashMap<Integer, Epic>>() {
+        }.getType());
         if (epicsFromServer != null) {
-            for (Epic epic: epicsFromServer.values()) {
+            for (Epic epic : epicsFromServer.values()) {
                 this.epics.put(epic.getId(), epic);
                 findMaxId(epic.getId());
             }
         }
 
         String subtasksJson = kvTaskClient.load(subtasksKey);
-        HashMap<Integer,Subtask> subtasksFromServer = gson.fromJson(subtasksJson, new TypeToken<HashMap<Integer, Subtask>>(){}.getType());
-        if (subtasksFromServer !=null) {
-            for (Subtask subtask: subtasksFromServer.values()) {
+        HashMap<Integer, Subtask> subtasksFromServer = gson.fromJson(subtasksJson, new TypeToken<HashMap<Integer, Subtask>>() {
+        }.getType());
+        if (subtasksFromServer != null) {
+            for (Subtask subtask : subtasksFromServer.values()) {
                 this.subtasks.put(subtask.getId(), subtask);
                 findMaxId(subtask.getId());
                 prioritizedTasks.add(subtask);
@@ -87,7 +79,8 @@ public class HTTPTaskManager extends InMemoryTaskManager{
         }
 
         String historyJson = kvTaskClient.load(historyKey);
-        List<Integer> historyIdFromServer = gson.fromJson(historyJson, new TypeToken<ArrayList<Integer>>(){}.getType());
+        List<Integer> historyIdFromServer = gson.fromJson(historyJson, new TypeToken<ArrayList<Integer>>() {
+        }.getType());
         if (historyIdFromServer != null) {
             for (Integer idTask : historyIdFromServer) {
                 if (tasks.containsKey(idTask)) {

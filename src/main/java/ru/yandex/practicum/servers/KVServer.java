@@ -17,7 +17,7 @@ public class KVServer {
     private final String apiToken;
     private final HttpServer server;
     private final Map<String, String> data = new HashMap<>();
-    private Gson gson;
+    private final Gson gson;
 
     public KVServer() throws IOException {
         apiToken = generateApiToken();

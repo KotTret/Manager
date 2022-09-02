@@ -3,7 +3,6 @@ package ru.yandex.practicum.servers.handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.practicum.domain.Subtask;
-import ru.yandex.practicum.domain.Task;
 import ru.yandex.practicum.exceptions.CollisionTaskException;
 
 import java.io.IOException;
@@ -61,7 +60,7 @@ public class SubtasksHandler extends Handler implements HttpHandler {
         }
     }
 
-    private void createMappingForPOST(String idNewTask,  String bodyTask) {
+    private void createMappingForPOST(String idNewTask, String bodyTask) {
         Subtask newTask = gson.fromJson(bodyTask, Subtask.class);
         if (newTask.getIdEpic() == null || manager.getEpics().containsKey(newTask.getIdEpic())) {
             rCode = 400;
@@ -74,7 +73,7 @@ public class SubtasksHandler extends Handler implements HttpHandler {
                 rCode = 400;
                 response = "Задача не добавлена, время занято";
             }
-        } else if (newTask.getId() == null ||!idNewTask.equals(String.valueOf(newTask.getId()))) {
+        } else if (newTask.getId() == null || !idNewTask.equals(String.valueOf(newTask.getId()))) {
             rCode = 400;
             response = "Переданный id и id в теле запроса не совпадают";
         } else if (manager.getSubtasks().containsKey(newTask.getId())) {

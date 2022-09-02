@@ -316,35 +316,6 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setStartTime(startEpic);
         epic.setEndTime(endTimeEpic);
         epic.setDuration(Duration.ofMinutes(durationEpic));
-
-/*        if (epic.getListIdSubtask().isEmpty()) {
-            epic.setDuration(Duration.ofMinutes(0));
-            epic.setEndTime(null);
-            epic.setStartTime(null);
-        } else {
-            Optional<String> startTimeSubtasks = epic.getListIdSubtask().stream().map(subtasks::get).map(Subtask::getStartTime)
-                    .filter(s -> !s.equals("Время ещё не задано")).sorted().findFirst();
-
-            Optional<String> endTimeSubtasks = epic.getListIdSubtask().stream().map(subtasks::get).map(Subtask::getStartTime)
-                    .filter(s -> !s.equals("Время ещё не задано")).sorted().reduce((first, second) -> second);
-
-            long durationTask = epic.getListIdSubtask().stream().map(subtasks::get).map(Subtask::getDuration)
-                    .map(Duration::toMinutes).mapToLong(Long::intValue).sum();
-            if (startTimeSubtasks.isEmpty()) {
-                epic.setStartTime(null);
-                epic.setEndTime(null);
-                epic.setDuration(Duration.ofMinutes(0));
-            }
-            if (endTimeSubtasks.isEmpty()) {
-                epic.setEndTime(null);
-            }
-            if (endTimeSubtasks.isPresent() && startTimeSubtasks.isPresent()) {
-                epic.setStartTime(LocalDateTime.parse(startTimeSubtasks.get(), Task.formatter));
-                epic.setEndTime(LocalDateTime.parse(endTimeSubtasks.get(), Task.formatter));
-                epic.setDuration(Duration.ofMinutes(durationTask));
-            }
-
-        }*/
     }
 
     public int getId() {
