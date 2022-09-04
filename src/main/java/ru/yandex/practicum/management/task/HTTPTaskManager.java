@@ -11,42 +11,53 @@ import ru.yandex.practicum.domain.Task;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HTTPTaskManager extends InMemoryTaskManager {
+public class HTTPTaskManager extends FileBackedTasksManager {
 
     private final KVTaskClient kvTaskClient;
     private static Gson gson;
-    private final String tasksKey = "tasks";
-    private final String epicsKey = "epics";
-    private final String subtasksKey = "subtasks";
-    private final String historyKey = "history";
+    private static final String TASKS_KEY = "tasks";
+    private static final String EPICS_KEY = "epics";
+    private static final String SUBTASKS_KEY = "subtasks";
+    private static final String HISTORY_KEY = "history";
 
 
-    public HTTPTaskManager(String url) {
-        kvTaskClient = new KVTaskClient(url);
+
+
+    public HTTPTaskManager(String uri, boolean isLoadFromServer) {
+        super(null);
+        kvTaskClient = new KVTaskClient(uri);
         gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .serializeNulls()
                 .create();
-        loadFromServer();
+        if (isLoadFromServer) {
+            loadFromServer();
+        }
+        save();
     }
 
+    public HTTPTaskManager(String uri) {
+        this(uri, false);
+    }
+
+    @Override
     public void save() {
         String tasksJson = gson.toJson(tasks);
         String epicsJson = gson.toJson(epics);
         String subtaskJson = gson.toJson(subtasks);
-        kvTaskClient.put(tasksKey, tasksJson);
-        kvTaskClient.put(epicsKey, epicsJson);
-        kvTaskClient.put(subtasksKey, subtaskJson);
+        kvTaskClient.put(TASKS_KEY, tasksJson);
+        kvTaskClient.put(EPICS_KEY, epicsJson);
+        kvTaskClient.put(SUBTASKS_KEY, subtaskJson);
 
         String historyJson = gson.toJson(historyManager.getHistory().stream()
                 .map(Task::getId)
                 .collect(Collectors.toList()));
-        kvTaskClient.put(historyKey, historyJson);
+        kvTaskClient.put(HISTORY_KEY, historyJson);
     }
 
     public void loadFromServer() {
 
-        String tasksJson = kvTaskClient.load(tasksKey);
+        String tasksJson = kvTaskClient.load(TASKS_KEY);
         HashMap<Integer, Task> tasksFromServer = gson.fromJson(tasksJson, new TypeToken<HashMap<Integer, Task>>() {
         }.getType());
         if (tasksFromServer != null) {
@@ -57,7 +68,7 @@ public class HTTPTaskManager extends InMemoryTaskManager {
             }
         }
 
-        String epicJson = kvTaskClient.load(epicsKey);
+        String epicJson = kvTaskClient.load(EPICS_KEY);
         HashMap<Integer, Epic> epicsFromServer = gson.fromJson(epicJson, new TypeToken<HashMap<Integer, Epic>>() {
         }.getType());
         if (epicsFromServer != null) {
@@ -67,7 +78,7 @@ public class HTTPTaskManager extends InMemoryTaskManager {
             }
         }
 
-        String subtasksJson = kvTaskClient.load(subtasksKey);
+        String subtasksJson = kvTaskClient.load(SUBTASKS_KEY);
         HashMap<Integer, Subtask> subtasksFromServer = gson.fromJson(subtasksJson, new TypeToken<HashMap<Integer, Subtask>>() {
         }.getType());
         if (subtasksFromServer != null) {
@@ -78,7 +89,7 @@ public class HTTPTaskManager extends InMemoryTaskManager {
             }
         }
 
-        String historyJson = kvTaskClient.load(historyKey);
+        String historyJson = kvTaskClient.load(HISTORY_KEY);
         List<Integer> historyIdFromServer = gson.fromJson(historyJson, new TypeToken<ArrayList<Integer>>() {
         }.getType());
         if (historyIdFromServer != null) {
@@ -92,99 +103,5 @@ public class HTTPTaskManager extends InMemoryTaskManager {
                 }
             }
         }
-    }
-
-    private void findMaxId(Integer idFromServer) {
-        if (this.id < idFromServer) {
-            this.id = idFromServer;
-        }
-    }
-
-    @Override
-    public Task getTaskById(Integer id) {
-        Task task =  super.getTaskById(id);
-        save();
-        return task;
-
-    }
-
-    @Override
-    public Epic getEpicById(Integer id) {
-        Epic epic =  super.getEpicById(id);
-        save();
-        return epic;
-    }
-
-    @Override
-    public Subtask getSubtaskById(Integer id) {
-        Subtask subtask =  super.getSubtaskById(id);
-        save();
-        return subtask;
-    }
-
-    @Override
-    public void addTask(Task task) {
-        super.addTask(task);
-        save();
-    }
-
-    @Override
-    public void addSubtask(Subtask subtask) {
-        super.addSubtask(subtask);
-        save();
-    }
-
-    @Override
-    public void addEpic(Epic epic) {
-        super.addEpic(epic);
-        save();
-    }
-
-    @Override
-    public void deleteTaskById(Integer id) {
-        super.deleteTaskById(id);
-        save();
-    }
-
-    @Override
-    public void deleteSubtaskById(Integer id) {
-        super.deleteSubtaskById(id);
-        save();
-    }
-
-    @Override
-    public void deleteEpicById(Integer id) {
-        super.deleteEpicById(id);
-        save();
-    }
-
-    @Override
-    public void updateTask(Task task) {
-        super.updateTask(task);
-        save();
-    }
-
-    @Override
-    public void deleteAll() {
-        super.deleteAll();
-        save();
-    }
-
-    @Override
-    public void deleteAllTask() {
-        super.deleteAllTask();
-        save();
-    }
-
-    @Override
-    public void deleteAllEpic() {
-        super.deleteAllEpic();
-        save();
-    }
-
-    @Override
-    public void deleteAllSubtask() {
-        super.deleteAllSubtask();
-        save();
     }
 }

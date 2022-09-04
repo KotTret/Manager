@@ -46,9 +46,10 @@ public class HTTPTaskServerTest {
         kvServer = new KVServer();
         kvServer.start();
         httpTaskServer = new HttpTaskServer();
-        httpTaskServer.createAndStartServer();
+        httpTaskServer.createServer();
+        httpTaskServer.start();
         client = HttpClient.newHttpClient();
-        manager = HttpTaskServer.manager;
+        manager = httpTaskServer.getManager();
         task1 = new Task("one", "qwerty", Status.DONE, 30, "13.03.2022 12:33");
         task2 = new Task("one", "qwerty", Status.DONE, 30, "14.02.2022 12:33");
         epic1 = new Epic("One", "learn english");
@@ -68,10 +69,8 @@ public class HTTPTaskServerTest {
 
     @AfterEach
       void afterEach() {
-        HttpTaskServer.manager.deleteAll();
         kvServer.stop();
         httpTaskServer.stop();
-
     }
 
     @BeforeAll
@@ -103,7 +102,7 @@ public class HTTPTaskServerTest {
         URI url = URI.create(urlTaskServer + "tasks/");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE()
                 .header("Content-Type", "application/json").build();
-        client.send(request, HttpResponse.BodyHandlers.ofString());
+        client.send(request, HttpResponse.BodyHandlers.discarding());
         request = HttpRequest.newBuilder().uri(url).GET()
                 .header("Content-Type", "application/json").build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

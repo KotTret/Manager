@@ -1,8 +1,7 @@
 package ru.yandex.practicum.clients;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import ru.yandex.practicum.exceptions.CollisionTaskException;
+import ru.yandex.practicum.exceptions.ConnectionToServerException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -11,11 +10,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class KVTaskClient {
-    HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client;
     private final String url;
     private final String apiToken;
 
     public KVTaskClient(String url) {
+        client = HttpClient.newHttpClient();
         this.url = url;
         apiToken = register(url);
     }
@@ -28,13 +28,15 @@ public class KVTaskClient {
                 .header("Accept", "application/json")
                 .build();
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
             if (!(response.statusCode() == 200)) {
-              throw new CollisionTaskException("Что-то пошло не так. Сервер вернул код состояния: " + response.statusCode());
+              throw new ConnectionToServerException("Что-то пошло не так. Сервер вернул код состояния: "
+                      + response.statusCode());
             }
-        } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+        } catch (IOException | InterruptedException e) {
+            String message = "Во время выполнения запроса возникла ошибка.\n" +
+                    "Проверьте, пожалуйста, адрес и повторите попытку.";
+            throw new ConnectionToServerException(message, e);
         }
     }
 
@@ -47,18 +49,18 @@ public class KVTaskClient {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                JsonElement jsonElement = JsonParser.parseString(response.body());
-
-                return jsonElement.getAsString();
-
+                /*без парсинга в самом менеджере уже приводик к ошибке при обработке json,
+                * возможно из-за надстрок gson, т.к. я там настравиваю, чтобы был перенос (читабельное отображение)
+                * попытался по другому, но лучше этого ничего не нашёл*/
+                return JsonParser.parseString(response.body()).getAsString();
             } else {
-               // System.out.println("Что-то пошло не так. Сервер вернул код состояния: " + response.statusCode());
-                return null;
+               String message = "Что-то пошло не так. Сервер вернул код состояния: " + response.statusCode();
+               throw new ConnectionToServerException(message);
             }
-        } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
-            return null;
+        } catch (IOException | InterruptedException e) {
+            String message = "Во время выполнения запроса возникла ошибка.\n" +
+                    "Проверьте, пожалуйста, адрес и повторите попытку.";
+            throw new ConnectionToServerException(message, e);
         }
 
     }
@@ -74,11 +76,16 @@ public class KVTaskClient {
                 .build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body();
-        } catch (IOException | InterruptedException e) { // обработка ошибки отправки запроса
-            System.out.println("Во время выполнения запроса ресурса по URL-адресу: '" + url + "' возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
-            return null;
+               if (response.statusCode() == 200) {
+                return response.body();
+            } else {
+               String message = "Что-то пошло не так. Сервер вернул код состояния: " + response.statusCode();
+               throw new ConnectionToServerException(message);
+            }
+        } catch (IOException | InterruptedException e) {
+             String message = "Во время выполнения запроса возникла ошибка.\n" +
+                    "Проверьте, пожалуйста, адрес и повторите попытку.";
+            throw new ConnectionToServerException(message, e);
         }
     }*/
 }

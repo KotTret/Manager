@@ -7,8 +7,8 @@ import java.io.File;
 
 public final class Managers {
 
-    public static TaskManager getDefault(String utl) {
-        return  new HTTPTaskManager(utl);
+    public static TaskManager getDefault(String url) {
+        return  new HTTPTaskManager(url);
     }
 
     public static TaskManager getFileBackedTasksManager(File file) {

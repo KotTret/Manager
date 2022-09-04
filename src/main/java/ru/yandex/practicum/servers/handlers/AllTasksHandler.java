@@ -1,17 +1,20 @@
 package ru.yandex.practicum.servers.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.practicum.domain.Task;
+import ru.yandex.practicum.management.task.TaskManager;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 
-public class AllTasksHandler extends Handler implements HttpHandler {
+public class AllTasksHandler extends Handler {
+
+    public AllTasksHandler(TaskManager manager) {
+        super(manager);
+    }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         super.handle(exchange);
@@ -21,17 +24,17 @@ public class AllTasksHandler extends Handler implements HttpHandler {
                         manager.getEpics());
                 response = gson.toJson(allTasks);
                 exchange.sendResponseHeaders(200, 0);
+                writeResponseBody(exchange);
                 break;
             case "DELETE":
                 manager.deleteAll();
                 exchange.sendResponseHeaders(200, 0);
+                exchange.close();
                 break;
             default:
                 response = "Некорректный метод!";
                 exchange.sendResponseHeaders(405, 0);
-        }
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(response.getBytes(StandardCharsets.UTF_8));
+                exchange.close();
         }
     }
 }

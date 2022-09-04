@@ -3,7 +3,7 @@ package ru.yandex.practicum;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.management.task.FileBackedTasksManager;
+import ru.yandex.practicum.management.task.HTTPTaskManager;
 import ru.yandex.practicum.management.task.Managers;
 import ru.yandex.practicum.management.task.TaskManager;
 import ru.yandex.practicum.servers.KVServer;
@@ -12,7 +12,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HTTPTaskManagerTest extends TaskManagerTest<FileBackedTasksManager> {
+public class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager> {
     private final String url = "http://localhost:8078/";
     private  KVServer kvServer;
 
@@ -31,7 +31,7 @@ public class HTTPTaskManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
     @Test
     void saveToFileAndLoadFromFileForEmptyListTest() {
-        TaskManager manager2 = Managers.getDefault(url);
+        TaskManager manager2 =  new HTTPTaskManager(url, true);
         assertEquals(manager.getId(), manager.getId(), "Неверно восстановлен Id");
         assertEquals(manager, manager2, "Десериализация менеджера прошла с ошибкой");
     }
@@ -42,7 +42,13 @@ public class HTTPTaskManagerTest extends TaskManagerTest<FileBackedTasksManager>
         addEpics();
         manager.getTaskById(1);
         manager.getEpicById(3);
-        TaskManager manager2 = Managers.getDefault(url);
+        TaskManager manager2 = new HTTPTaskManager(url, true);
+        /* вот тут не совсем понял по замечанию (P.S. спросил бы в слаке, но пора уже уезжать :) )
+        * я оставил как было, в этой проверке я сравниваю каждое поле менеджера, который подгружает на сервер
+        * с тем менеджером, который эти данные загрузил из сервера, у тебя там было прописано
+        * "Где проверяется каждая мапа на то, что все данные с сервера совпадают с теми, что были в памяти до выгрузки
+        * на KVServer. (следует таким образом проверить подзадачи, задачи, эпики, отсортированный список, историю)"
+        * и я чтот не совсем понял разницу*/
         assertEquals(manager.getId(), manager2.getId(), "Неверно восстановлен Id");
         assertEquals(manager.getHistory(), manager2.getHistory(), "Десериализация менеджера прошла с ошибкой History");
         assertEquals(manager.getTasks(), manager2.getTasks(), "Десериализация менеджера прошла с ошибкой Tasks");
@@ -57,7 +63,7 @@ public class HTTPTaskManagerTest extends TaskManagerTest<FileBackedTasksManager>
     void saveToServerAndLoadFromServerWhenHistoryIsEmptyTest() {
         addTasks();
         addEpics();
-        TaskManager manager2 = Managers.getDefault(url);
+        TaskManager manager2 = new HTTPTaskManager(url, true);
         assertEquals(manager.getId(), manager.getId(), "Неверно восстановлен Id");
         assertEquals(manager.getHistory(), manager2.getHistory(), "Десериализация менеджера прошла с ошибкой History");
         assertEquals(manager.getTasks(), manager2.getTasks(), "Десериализация менеджера прошла с ошибкой Tasks");

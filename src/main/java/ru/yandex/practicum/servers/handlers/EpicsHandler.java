@@ -1,19 +1,16 @@
 package ru.yandex.practicum.servers.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-
-import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.practicum.domain.Epic;
-
-import ru.yandex.practicum.exceptions.CollisionTaskException;
-
-
-
+import ru.yandex.practicum.management.task.TaskManager;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 
-public class EpicsHandler extends Handler implements HttpHandler {
+public class EpicsHandler extends Handler {
+
+    public EpicsHandler(TaskManager manager) {
+        super(manager);
+    }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         super.handle(exchange);
@@ -22,7 +19,7 @@ public class EpicsHandler extends Handler implements HttpHandler {
                 createMappingForGET(idNewTask);
                 break;
             case "POST":
-                createMappingForPOST(idNewTask, bodyTask);
+                createMappingForPOST(bodyTask);
                 break;
             case "DELETE":
                 createMappingForDELETE(idNewTask);
@@ -31,9 +28,12 @@ public class EpicsHandler extends Handler implements HttpHandler {
                 rCode = 405;
         }
         exchange.sendResponseHeaders(rCode, 0);
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(response.getBytes(StandardCharsets.UTF_8));
+        if (response != null)  {
+            writeResponseBody(exchange);
+        } else {
+            exchange.close();
         }
+
     }
 
     private void createMappingForDELETE(String idNewTask) {
@@ -64,27 +64,16 @@ public class EpicsHandler extends Handler implements HttpHandler {
         }
     }
 
-    private void createMappingForPOST(String idNewTask,  String bodyTask) {
-        Epic newTask = gson.fromJson(bodyTask, Epic.class);
-        if (idNewTask == null) {
-            try {
-                manager.addEpic(newTask);
-            } catch (CollisionTaskException e) {
-                e.printStackTrace();
-                rCode = 400;
-                response = "Задача не добавлена, время занято";
-            }
-        } else if (newTask.getId() == null ||!idNewTask.equals(String.valueOf(newTask.getId()))) {
+    private void createMappingForPOST(String bodyTask) {
+        if (bodyTask.isEmpty()) {
             rCode = 400;
-            response = "Переданный id и id в теле запроса не совпадают";
+            return;
+        }
+        Epic newTask = gson.fromJson(bodyTask, Epic.class);
+        if (newTask.getId() == null) {
+                manager.addEpic(newTask);
         } else if (manager.getEpics().containsKey(newTask.getId())) {
-            try {
                 manager.updateTask(newTask);
-            } catch (CollisionTaskException e) {
-                e.printStackTrace();
-                rCode = 400;
-                response = "Задача не обвновлена, время занято";
-            }
         } else {
             rCode = 400;
         }

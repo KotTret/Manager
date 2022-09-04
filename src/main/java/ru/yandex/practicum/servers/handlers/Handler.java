@@ -5,18 +5,19 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import ru.yandex.practicum.management.task.HTTPTaskManager;
-import ru.yandex.practicum.servers.HttpTaskServer;
+import ru.yandex.practicum.management.task.TaskManager;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 
 abstract class Handler implements HttpHandler {
-    protected HTTPTaskManager manager = (HTTPTaskManager) HttpTaskServer.manager;
+    protected TaskManager manager;
     protected Gson gson;
     protected String response;
     protected String method;
@@ -25,6 +26,10 @@ abstract class Handler implements HttpHandler {
     protected String bodyTask;
     protected String idNewTask;
 
+
+    public Handler(TaskManager manager) {
+        this.manager = manager;
+    }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -35,13 +40,12 @@ abstract class Handler implements HttpHandler {
         method = exchange.getRequestMethod();
         headers = exchange.getResponseHeaders();
         headers.set("Content-Type", "application/json");
-        response = "";
         rCode = 200;
         bodyTask = checkAndReturnPassedRequestParameters(exchange).get(0);
         idNewTask = checkAndReturnPassedRequestParameters(exchange).get(1);
     }
 
-    protected ArrayList<String> checkAndReturnPassedRequestParameters(HttpExchange exchange) throws IOException {
+    private ArrayList<String> checkAndReturnPassedRequestParameters(HttpExchange exchange) throws IOException {
         String URI = exchange.getRequestURI().toString();
         Map<String, String> param = new HashMap<>();
         String[] components = URI.split("[\\?\\&]");
@@ -68,5 +72,11 @@ abstract class Handler implements HttpHandler {
         requestTask.add(body);
         requestTask.add(idNewTask);
         return requestTask;
+    }
+
+    protected void writeResponseBody(HttpExchange exchange) throws IOException {
+        try (OutputStream os = exchange.getResponseBody()) {
+            os.write(response.getBytes(StandardCharsets.UTF_8));
+        }
     }
 }

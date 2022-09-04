@@ -113,7 +113,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private void save() {
+    protected void save() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file.getPath(), StandardCharsets.UTF_8))) {
             bw.write(TABLE_HEADER);
             for (Task task : tasks.values()) {
@@ -145,9 +145,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return String.join(",", idHistoryToString);
     }
 
-    private void findMaxId(Integer idFromCSV) {
-        if (this.id < idFromCSV) {
-            this.id = idFromCSV;
+    protected void findMaxId(Integer idNew) {
+        if (this.id < idNew) {
+            this.id = idNew;
         }
     }
 

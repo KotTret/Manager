@@ -18,7 +18,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Subtask> subtasks = new HashMap<>();
     protected final Set<Task> prioritizedTasks = new TreeSet<>();
 
-    protected int id = 0;
+    protected Integer id = 0;
 
     private boolean checkForIntersectionOfTasks(Task newTask) throws CollisionTaskException{
         if (newTask.getStartTime().equals("Время ещё не задано")) {
