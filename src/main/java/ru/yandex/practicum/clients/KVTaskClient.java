@@ -49,9 +49,6 @@ public class KVTaskClient {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                /*без парсинга в самом менеджере уже приводик к ошибке при обработке json,
-                * возможно из-за надстрок gson, т.к. я там настравиваю, чтобы был перенос (читабельное отображение)
-                * попытался по другому, но лучше этого ничего не нашёл*/
                 return JsonParser.parseString(response.body()).getAsString();
             } else {
                String message = "Что-то пошло не так. Сервер вернул код состояния: " + response.statusCode();
@@ -62,13 +59,10 @@ public class KVTaskClient {
                     "Проверьте, пожалуйста, адрес и повторите попытку.";
             throw new ConnectionToServerException(message, e);
         }
-
     }
 
     private String register(String url) {
-        return "DEBUG";
-    }
-/*        URI urlRegister = URI.create(url + "register");
+        URI urlRegister = URI.create(url + "register");
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .uri(urlRegister)
@@ -87,5 +81,5 @@ public class KVTaskClient {
                     "Проверьте, пожалуйста, адрес и повторите попытку.";
             throw new ConnectionToServerException(message, e);
         }
-    }*/
+    }
 }

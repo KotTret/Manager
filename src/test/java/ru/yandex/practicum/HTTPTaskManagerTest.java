@@ -43,12 +43,6 @@ public class HTTPTaskManagerTest extends TaskManagerTest<HTTPTaskManager> {
         manager.getTaskById(1);
         manager.getEpicById(3);
         TaskManager manager2 = new HTTPTaskManager(url, true);
-        /* вот тут не совсем понял по замечанию (P.S. спросил бы в слаке, но пора уже уезжать :) )
-        * я оставил как было, в этой проверке я сравниваю каждое поле менеджера, который подгружает на сервер
-        * с тем менеджером, который эти данные загрузил из сервера, у тебя там было прописано
-        * "Где проверяется каждая мапа на то, что все данные с сервера совпадают с теми, что были в памяти до выгрузки
-        * на KVServer. (следует таким образом проверить подзадачи, задачи, эпики, отсортированный список, историю)"
-        * и я чтот не совсем понял разницу*/
         assertEquals(manager.getId(), manager2.getId(), "Неверно восстановлен Id");
         assertEquals(manager.getHistory(), manager2.getHistory(), "Десериализация менеджера прошла с ошибкой History");
         assertEquals(manager.getTasks(), manager2.getTasks(), "Десериализация менеджера прошла с ошибкой Tasks");

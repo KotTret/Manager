@@ -41,7 +41,7 @@ public class HTTPTaskManager extends FileBackedTasksManager {
     }
 
     @Override
-    public void save() {
+    protected void save() {
         String tasksJson = gson.toJson(tasks);
         String epicsJson = gson.toJson(epics);
         String subtaskJson = gson.toJson(subtasks);
@@ -55,7 +55,7 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         kvTaskClient.put(HISTORY_KEY, historyJson);
     }
 
-    public void loadFromServer() {
+    private void loadFromServer() {
 
         String tasksJson = kvTaskClient.load(TASKS_KEY);
         HashMap<Integer, Task> tasksFromServer = gson.fromJson(tasksJson, new TypeToken<HashMap<Integer, Task>>() {

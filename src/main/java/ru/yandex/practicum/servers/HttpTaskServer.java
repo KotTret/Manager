@@ -16,11 +16,6 @@ public class HttpTaskServer {
     private static final String URL = "http://localhost:8078/";
     private final TaskManager manager = Managers.getDefault(URL);
 
-    /*подскажи еще пожалуйста, исключение, которое может возникнуть здесь, мы его должны перехватить
-    * или  на данном этапе, не надо, пока мы просто на сервер пускаем запросы. Тогда
-    * у меня возникает вопрос :) в KVTaskClient когда мы исключения оборачиваем в свое кастомное,
-    * мы должны его по хорошему поймать в менеджере, и там, допустим, автоматом повторить запрос
-    * или сделать повторное сохранение?*/
     public void createServer() throws IOException {
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks/", new AllTasksHandler(manager));
